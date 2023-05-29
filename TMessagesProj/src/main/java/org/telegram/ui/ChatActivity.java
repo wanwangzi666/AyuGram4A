@@ -116,6 +116,7 @@ import com.exteragram.messenger.boost.BoostController;
 import com.exteragram.messenger.boost.encryption.EncryptionHelper;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.zxing.common.detector.MathUtils;
+import com.radolyn.ayugram.AyuConfig;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
@@ -18710,6 +18711,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (res == null || res.messages == null) {
             return;
         }
+        ArrayList<MessageObject> nonAds = new ArrayList<>();
         for (int i = 0; i < res.messages.size(); i++) {
             MessageObject messageObject = res.messages.get(i);
             messageObject.resetLayout();
@@ -18718,14 +18720,28 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             if (messageObject.sponsoredChannelPost != 0) {
                 messageId = messageObject.sponsoredChannelPost;
             }
-            getMessagesController().ensureMessagesLoaded(dialogId, messageId, null);
+            if (AyuConfig.enableAds) {
+                getMessagesController().ensureMessagesLoaded(dialogId, messageId, null);
+            } else {
+                if (!messageObject.isSponsored()) {
+                    getMessagesController().ensureMessagesLoaded(dialogId, messageId, null);
+                    nonAds.add(messageObject);
+                } else {
+                    markSponsoredAsRead(messageObject);
+                }
+            }
         }
         sponsoredMessagesAdded = true;
-        sponsoredMessagesPostsBetween = res.posts_between != null ? res.posts_between : 0;
-        if (notPushedSponsoredMessages != null) {
-            notPushedSponsoredMessages.clear();
+        if (AyuConfig.enableAds) {
+            sponsoredMessagesPostsBetween = res.posts_between != null ? res.posts_between : 0;
+            if (notPushedSponsoredMessages != null) {
+                notPushedSponsoredMessages.clear();
+            }
+            processNewMessages(res.messages);
+        } else {
+            if (nonAds.isEmpty()) return;
+            processNewMessages(nonAds);
         }
-        processNewMessages(res.messages);
     }
 
     private void checkGroupCallJoin(boolean fromServer) {
@@ -19765,14 +19781,19 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     private int getSponsoredMessagesCount() {
-        int sponsoredMessagesCount = 0;
-        while (sponsoredMessagesCount < messages.size()) {
-            if (!messages.get(sponsoredMessagesCount).isSponsored()) {
-                break;
+        if (AyuConfig.enableAds) {
+            int sponsoredMessagesCount = 0;
+            while (sponsoredMessagesCount < messages.size()) {
+                if (!messages.get(sponsoredMessagesCount).isSponsored()) {
+                    break;
+                }
+                sponsoredMessagesCount++;
             }
-            sponsoredMessagesCount++;
+            return sponsoredMessagesCount;
         }
-        return sponsoredMessagesCount;
+
+        // !AyuConfig.enableAds
+        return 0;
     }
 
     private void processDeletedMessages(ArrayList<Integer> markAsDeletedMessages, long channelId) {
