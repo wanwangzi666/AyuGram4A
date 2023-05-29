@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.exteragram.messenger.preferences.components.HeaderSettingsCell;
 import com.exteragram.messenger.preferences.updater.UpdaterBottomSheet;
+import com.radolyn.ayugram.ui.preferences.AyuGramPreferencesActivity;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BuildVars;
@@ -53,6 +54,7 @@ public class MainPreferencesActivity extends BasePreferencesActivity {
     private int appearanceRow;
     private int chatsRow;
     private int otherRow;
+    private int ayuRow;
 
     private int categoryDividerRow;
     private int aboutExteraDividerRow;
@@ -198,6 +200,7 @@ public class MainPreferencesActivity extends BasePreferencesActivity {
         appearanceRow = newRow();
         chatsRow = newRow();
         otherRow = newRow();
+        ayuRow = newRow();
         categoryDividerRow = newRow();
 
         infoHeaderRow = newRow();
@@ -227,6 +230,8 @@ public class MainPreferencesActivity extends BasePreferencesActivity {
             presentFragment(new ChatsPreferencesActivity());
         } else if (position == otherRow) {
             presentFragment(new OtherPreferencesActivity());
+        } else if (position == ayuRow) {
+            presentFragment(new AyuGramPreferencesActivity());
         } else if (position == generalRow) {
             presentFragment(new GeneralPreferencesActivity());
         }
@@ -274,6 +279,8 @@ public class MainPreferencesActivity extends BasePreferencesActivity {
                         textCell.setTextAndIcon(LocaleController.getString("SearchAllChatsShort", R.string.SearchAllChatsShort), R.drawable.msg_discussion, true);
                     } else if (position == otherRow) {
                         textCell.setTextAndIcon(LocaleController.getString("LocalOther", R.string.LocalOther), R.drawable.msg_fave, false);
+                    } else if (position == ayuRow) {
+                        textCell.setTextAndIcon(LocaleController.getString("AyuPreferences", R.string.AyuPreferences), R.drawable.msg_premium_badge, false);
                     } else if (position == channelRow) {
                         textCell.setTextAndValueAndIcon(LocaleController.getString("Channel", R.string.Channel), "@ayugram1338", R.drawable.msg_channel, true);
                     } else if (position == groupRow) {

@@ -117,6 +117,9 @@ import com.exteragram.messenger.boost.encryption.EncryptionHelper;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.zxing.common.detector.MathUtils;
 import com.radolyn.ayugram.AyuConfig;
+import com.radolyn.ayugram.AyuConstants;
+import com.radolyn.ayugram.messages.AyuMessagesController;
+import com.radolyn.ayugram.ui.AyuMessageHistory;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
@@ -24053,6 +24056,16 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
             }
 
+            if (message != null
+                    && ((message.messageOwner.flags & TLRPC.MESSAGE_FLAG_EDITED) != 0 || message.isEditing())
+                    && message.messageOwner.from_id != null
+                    && message.messageOwner.from_id.user_id != getAccountInstance().getUserConfig().getClientUserId()
+                    && AyuMessagesController.getInstance().hasAnyRevisions(getAccountInstance().getUserConfig().getClientUserId(), dialog_id, message.messageOwner.id)) {
+                items.add(LocaleController.getString("EditsHistoryMenuText", R.string.EditsHistoryMenuText));
+                options.add(AyuConstants.OPTION_HISTORY);
+                icons.add(R.drawable.msg_log);
+            }
+
             if (options.isEmpty() && optionsView == null) {
                 return false;
             }
@@ -25611,6 +25624,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
         boolean preserveDim = false;
         switch (option) {
+            case AyuConstants.OPTION_HISTORY:
+                presentFragment(new AyuMessageHistory(getUserConfig().clientUserId, selectedObject));
+                break;
             case OPTION_RETRY: {
                 if (selectedObjectGroup != null) {
                     boolean success = true;

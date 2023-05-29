@@ -22,6 +22,8 @@ import android.util.SparseIntArray;
 import androidx.annotation.UiThread;
 import androidx.collection.LongSparseArray;
 
+import com.radolyn.ayugram.messages.AyuMessagesController;
+
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.SQLite.SQLiteCursor;
 import org.telegram.SQLite.SQLiteDatabase;
@@ -13480,6 +13482,9 @@ public class MessagesStorage extends BaseController {
                                         sameMedia = oldMessage.media.photo.id == message.media.photo.id;
                                     } else if (oldMessage.media instanceof TLRPC.TL_messageMediaDocument && message.media instanceof TLRPC.TL_messageMediaDocument && oldMessage.media.document != null && message.media.document != null) {
                                         sameMedia = oldMessage.media.document.id == message.media.document.id;
+                                    }
+                                    if (message.from_id != null && (!oldMessage.message.equals(message.message) || !sameMedia)) {
+                                        AyuMessagesController.getInstance().onMessageEdited(oldMessage, message, getUserConfig().clientUserId, getAccountInstance().getCurrentAccount(), getConnectionsManager().getCurrentTime());
                                     }
                                     if (!sameMedia) {
                                         addFilesToDelete(oldMessage, filesToDelete, idsToDelete, namesToDelete, false);

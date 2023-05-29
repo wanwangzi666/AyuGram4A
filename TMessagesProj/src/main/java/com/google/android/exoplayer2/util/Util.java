@@ -39,9 +39,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.DatabaseUtils;
@@ -73,7 +71,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.C.ContentType;
-import com.google.android.exoplayer2.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ParserException;
@@ -87,7 +84,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import com.radolyn.ayugram.AyuPrivacyException;
+import com.radolyn.ayugram.exceptions.AyuPrivacyException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -124,7 +121,6 @@ import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.checkerframework.checker.nullness.compatqual.NullableType;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.checkerframework.checker.nullness.qual.PolyNull;
-import org.telegram.messenger.BuildVars;
 
 /** Miscellaneous utility methods. */
 public final class Util {
