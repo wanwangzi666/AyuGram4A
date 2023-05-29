@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.exteragram.messenger.ExteraConfig;
 import com.exteragram.messenger.utils.AppUtils;
 import com.exteragram.messenger.utils.UpdaterUtils;
+import com.radolyn.ayugram.AyuConstants;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BuildVars;
@@ -141,7 +142,7 @@ public class UpdaterBottomSheet extends BottomSheet {
             doneButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
             doneButton.setText(LocaleController.getString("AppUpdateDownloadNow", R.string.AppUpdateDownloadNow));
             doneButton.setOnClickListener(v -> {
-                UpdaterUtils.downloadApk(fragment.getContext(), args[3], "exteraGram " + args[0]);
+                UpdaterUtils.downloadApk(fragment.getContext(), args[3], AyuConstants.APP_NAME + " " + args[0]);
                 dismiss();
             });
             linearLayout.addView(doneButton, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, 0, 16, 15, 16, 5));

@@ -11,6 +11,8 @@
 
 package com.exteragram.messenger.utils;
 
+import com.radolyn.ayugram.AyuConstants;
+
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.R;
@@ -27,7 +29,7 @@ public class AppUtils {
         try {
             return ApplicationLoader.applicationContext.getString(R.string.exteraAppName);
         } catch (Exception e) {
-            return "exteraGram";
+            return AyuConstants.APP_NAME;
         }
     }
 
