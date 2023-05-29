@@ -12,6 +12,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.radolyn.ayugram.AyuConstants;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -189,13 +190,7 @@ public class ConnectionsManager extends BaseController {
             systemLangCode = LocaleController.getSystemLocaleStringIso639().toLowerCase();
             langCode = LocaleController.getLocaleStringIso639().toLowerCase();
             deviceModel = Build.MANUFACTURER + Build.MODEL;
-            PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
-            appVersion = pInfo.versionName + " (" + pInfo.versionCode + ")";
-            if (BuildVars.DEBUG_PRIVATE_VERSION) {
-                appVersion += " pbeta";
-            } else if (BuildVars.DEBUG_VERSION) {
-                appVersion += " beta";
-            }
+            appVersion = BuildVars.BUILD_VERSION_STRING + " (" + BuildVars.BUILD_VERSION + ")";
             systemVersion = "SDK " + Build.VERSION.SDK_INT;
         } catch (Exception e) {
             systemLangCode = "en";
@@ -442,7 +437,7 @@ public class ConnectionsManager extends BaseController {
         }
         String installer = "";
         try {
-            installer = ApplicationLoader.applicationContext.getPackageManager().getInstallerPackageName(ApplicationLoader.applicationContext.getPackageName());
+            installer = AyuConstants.BUILD_STORE_PACKAGE;
         } catch (Throwable ignore) {
 
         }
@@ -451,7 +446,7 @@ public class ConnectionsManager extends BaseController {
         }
         String packageId = "";
         try {
-            packageId = ApplicationLoader.applicationContext.getPackageName();
+            packageId = AyuConstants.BUILD_ORIGINAL_PACKAGE;
         } catch (Throwable ignore) {
 
         }

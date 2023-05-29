@@ -87,6 +87,8 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import com.radolyn.ayugram.AyuPrivacyException;
+
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -122,6 +124,7 @@ import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.checkerframework.checker.nullness.compatqual.NullableType;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.telegram.messenger.BuildVars;
 
 /** Miscellaneous utility methods. */
 public final class Util {
@@ -1637,22 +1640,9 @@ public final class Util {
    * @param applicationName String that will be prefix'ed to the generated user agent.
    * @return A user agent string generated using the applicationName and the library version.
    */
-  public static String getUserAgent(Context context, String applicationName) {
-    String versionName;
-    try {
-      String packageName = context.getPackageName();
-      PackageInfo info = context.getPackageManager().getPackageInfo(packageName, 0);
-      versionName = info.versionName;
-    } catch (NameNotFoundException e) {
-      versionName = "?";
-    }
-    return applicationName
-        + "/"
-        + versionName
-        + " (Linux;Android "
-        + Build.VERSION.RELEASE
-        + ") "
-        + ExoPlayerLibraryInfo.VERSION_SLASHY;
+  public static String getUserAgent(Context context, String applicationName) throws AyuPrivacyException {
+    // AyuGram: it's not being called
+    throw new AyuPrivacyException();
   }
 
   /** Returns the number of codec strings in {@code codecs} whose type matches {@code trackType}. */

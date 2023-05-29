@@ -13,4 +13,7 @@ public class AyuConstants {
             778327202, // @sharapagorg
             963494570, // @Zanko_no_tachi
     };
+
+    public static String BUILD_STORE_PACKAGE = "com.android.vending";
+    public static String BUILD_ORIGINAL_PACKAGE = "org.telegram.messenger";
 }
