@@ -53,6 +53,7 @@ public class AyuMessagesController {
 
         database = Room.databaseBuilder(ApplicationLoader.applicationContext, AyuDatabase.class, "ayu-data")
                 .allowMainThreadQueries()
+                .fallbackToDestructiveMigration()
                 .build();
     }
 
@@ -141,11 +142,7 @@ public class AyuMessagesController {
         msg.messageId = msgId;
         msg.date = currentTime;
 
-        try {
-            database.deletedMessageDao().insert(msg);
-        } catch (SQLiteConstraintException e) {
-            // ignored, I hate java
-        }
+        database.deletedMessageDao().insert(msg);
     }
 
     public boolean isDeleted(long userId, long dialogId, int msgId) {

@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "89b9f56bc73875a3215a3989aa1d7baa",
+    "version": 2,
+    "identityHash": "ba7007443c907bdd8a175d34e79702f0",
     "entities": [
       {
         "tableName": "EditedMessage",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fakeId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` INTEGER NOT NULL, `dialogId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `text` TEXT, `type` INTEGER NOT NULL, `path` TEXT, `date` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fakeId` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `dialogId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `text` TEXT, `type` INTEGER NOT NULL, `path` TEXT, `date` INTEGER NOT NULL, PRIMARY KEY(`fakeId`))",
         "fields": [
           {
             "fieldPath": "fakeId",
@@ -61,14 +61,14 @@
           "columnNames": [
             "fakeId"
           ],
-          "autoGenerate": true
+          "autoGenerate": false
         },
         "indices": [],
         "foreignKeys": []
       },
       {
         "tableName": "DeletedMessage",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fakeId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `userId` INTEGER NOT NULL, `dialogId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `date` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fakeId` INTEGER NOT NULL, `userId` INTEGER NOT NULL, `dialogId` INTEGER NOT NULL, `messageId` INTEGER NOT NULL, `date` INTEGER NOT NULL, PRIMARY KEY(`fakeId`))",
         "fields": [
           {
             "fieldPath": "fakeId",
@@ -105,7 +105,7 @@
           "columnNames": [
             "fakeId"
           ],
-          "autoGenerate": true
+          "autoGenerate": false
         },
         "indices": [],
         "foreignKeys": []
@@ -114,7 +114,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '89b9f56bc73875a3215a3989aa1d7baa')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ba7007443c907bdd8a175d34e79702f0')"
     ]
   }
 }
