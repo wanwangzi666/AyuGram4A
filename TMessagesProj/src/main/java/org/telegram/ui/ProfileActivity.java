@@ -101,6 +101,7 @@ import com.exteragram.messenger.preferences.MainPreferencesActivity;
 import com.exteragram.messenger.utils.AppUtils;
 import com.exteragram.messenger.utils.CanvasUtils;
 import com.exteragram.messenger.utils.ChatUtils;
+import com.radolyn.ayugram.AyuConfig;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
@@ -7548,7 +7549,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         fallbackImage.setImage(ImageLocation.getForPhoto(smallSize, getUserInfo().fallback_photo), "50_50", (Drawable) null, 0, null, UserConfig.getInstance(currentAccount).getCurrentUser(), 0);
                     }
                 } else {
-                    newString2 = LocaleController.getString("Online", R.string.Online);
+                    if (!AyuConfig.sendReadPackets || AyuConfig.sendOfflinePacketAfterOnline) {
+                        newString2 = LocaleController.getString("LikelyOfflineStatus", R.string.LikelyOfflineStatus);
+                    } else {
+                        newString2 = LocaleController.getString("Online", R.string.Online);
+                    }
                 }
             } else if (user.id == 333000 || user.id == 777000 || user.id == 42777) {
                 newString2 = LocaleController.getString("ServiceNotifications", R.string.ServiceNotifications);
