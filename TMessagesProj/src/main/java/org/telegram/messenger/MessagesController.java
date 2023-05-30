@@ -90,6 +90,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 import com.exteragram.messenger.ExteraConfig;
+import com.radolyn.ayugram.AyuConfig;
+import com.radolyn.ayugram.AyuConstants;
+import com.radolyn.ayugram.messages.AyuMessagesController;
 
 public class MessagesController extends BaseController implements NotificationCenter.NotificationCenterDelegate {
 
@@ -15117,6 +15120,35 @@ public class MessagesController extends BaseController implements NotificationCe
                 updatesOnMainThread.add(baseUpdate);
             }
         }
+
+        // --- AyuGram request hook
+        if (AyuConfig.keepDeletedMessages && deletedMessages != null) {
+            var userId = getAccountInstance().getUserConfig().clientUserId;
+            var ayuMessagesController = AyuMessagesController.getInstance();
+            for (int a = 0, size = deletedMessages.size(); a < size; a++) {
+                var dialogId = deletedMessages.keyAt(a);
+                var messageIds = deletedMessages.valueAt(a);
+
+                if (dialogId == 0) {
+                    // Telegram sometimes won't give us dialog id directly...
+                    dialogId = getMessagesStorage().getDialogIdsToUpdate(dialogId, messageIds).get(0);
+                }
+
+                for (var msgId : messageIds) {
+                    ayuMessagesController.onMessageDeleted(userId, dialogId, msgId, getConnectionsManager().getCurrentTime());
+                }
+
+                long finalDialogId = dialogId;
+                AndroidUtilities.runOnUIThread(() -> {
+                    // invalidating views
+                    getNotificationCenter().postNotificationName(AyuConstants.MESSAGES_DELETED_NOTIFICATION, finalDialogId, messageIds);
+                });
+            }
+
+            deletedMessages.clear();
+        }
+        // --- AyuGram request hook
+
         if (messages != null) {
             for (int a = 0, size = messages.size(); a < size; a++) {
                 long key = messages.keyAt(a);
