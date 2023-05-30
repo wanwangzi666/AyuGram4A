@@ -33,6 +33,7 @@ import androidx.collection.LongSparseArray;
 
 import com.exteragram.messenger.boost.encryption.BaseEncryptor;
 import com.exteragram.messenger.boost.filter.ZalgoFilter;
+import com.radolyn.ayugram.AyuConfig;
 import com.radolyn.ayugram.AyuConstants;
 
 import org.telegram.PhoneFormat.PhoneFormat;
@@ -5970,6 +5971,14 @@ public class MessageObject {
     }
 
     public boolean needDrawBluredPreview() {
+        return needDrawBluredPreview(!AyuConfig.keepDeletedMessages);
+    }
+
+    public boolean needDrawBluredPreview(boolean really) {
+        if (!really) {
+            return false;
+        }
+
         if (hasExtendedMediaPreview()) {
             return true;
         } else if (messageOwner instanceof TLRPC.TL_message_secret) {
@@ -7379,7 +7388,7 @@ public class MessageObject {
             TLRPC.PhotoSize currentPhotoObject = FileLoader.getClosestPhotoSizeWithSize(photoThumbs, AndroidUtilities.getPhotoSize());
             if (currentPhotoObject != null) {
                 File file = FileLoader.getInstance(currentAccount).getPathToMessage(messageOwner, useFileDatabaseQueue);
-                if (needDrawBluredPreview()) {
+                if (needDrawBluredPreview(true)) {
                     mediaExists = new File(file.getAbsolutePath() + ".enc").exists();
                 }
                 if (!mediaExists) {
@@ -7394,7 +7403,7 @@ public class MessageObject {
             }
             if (!attachPathExists) {
                 File file = FileLoader.getInstance(currentAccount).getPathToMessage(messageOwner, useFileDatabaseQueue);
-                if (type == TYPE_VIDEO && needDrawBluredPreview()) {
+                if (type == TYPE_VIDEO && needDrawBluredPreview(true)) {
                     mediaExists = new File(file.getAbsolutePath() + ".enc").exists();
                 }
                 if (!mediaExists) {

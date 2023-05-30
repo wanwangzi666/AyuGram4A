@@ -24082,6 +24082,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
             }
 
+            /// --- AyuGram menu
             if (message != null
                     && ((message.messageOwner.flags & TLRPC.MESSAGE_FLAG_EDITED) != 0 || message.isEditing())
                     && message.messageOwner.from_id != null
@@ -24091,6 +24092,26 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 options.add(AyuConstants.OPTION_HISTORY);
                 icons.add(R.drawable.msg_log);
             }
+
+            if (message != null && message.messageOwner.ttl > 0) {
+                items.add(String.format("TTL %d", message.messageOwner.ttl));
+                options.add(AyuConstants.OPTION_TTL);
+                icons.add(R.drawable.flame_small);
+            }
+
+            if (!(options.contains(4) || options.contains(7))
+                    && selectedObject != null && (selectedObject.isSecretMedia() || selectedObject.isGif() || selectedObject.isNewGif() || selectedObject.isPhoto() || selectedObject.isRoundVideo() || selectedObject.isVideo())) {
+                items.add(LocaleController.getString("SaveToGallery", R.string.SaveToGallery));
+                options.add(4);
+                icons.add(R.drawable.msg_gallery);
+            }
+            if (!options.contains(10)
+                    && selectedObject != null && (selectedObject.isSecretMedia() || selectedObject.isGif() || selectedObject.isNewGif() || selectedObject.isRoundVideo() || selectedObject.isVideo() || selectedObject.isDocument() || selectedObject.isMusic() || selectedObject.isVoice())) {
+                items.add(LocaleController.getString("SaveToDownloads", R.string.SaveToDownloads));
+                options.add(10);
+                icons.add(R.drawable.msg_download);
+            }
+            // --- AyuGram menu
 
             if (options.isEmpty() && optionsView == null) {
                 return false;
@@ -25652,6 +25673,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         switch (option) {
             case AyuConstants.OPTION_HISTORY:
                 presentFragment(new AyuMessageHistory(getUserConfig().clientUserId, selectedObject));
+                break;
+            case AyuConstants.OPTION_TTL:
+                sendSecretMessageRead(selectedObject, true);
                 break;
             case OPTION_RETRY: {
                 if (selectedObjectGroup != null) {

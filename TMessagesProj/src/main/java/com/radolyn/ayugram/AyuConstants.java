@@ -11,6 +11,7 @@ public class AyuConstants {
             963494570, // @Zanko_no_tachi
     };
     public static final int OPTION_HISTORY = 1338_01;
+    public static final int OPTION_TTL = 1338_02;
     public static final int MESSAGES_DELETED_NOTIFICATION = 6969;
     public static String APP_GITHUB = "AyuGram/AyuGram4A";
     public static String APP_NAME = "AyuGram";
