@@ -3,17 +3,16 @@ package org.telegram.tgnet;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.radolyn.ayugram.AyuConfig;
 import com.radolyn.ayugram.AyuConstants;
+import com.radolyn.ayugram.messages.AyuState;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,7 +41,6 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -59,8 +57,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.net.ssl.SSLException;
 
 public class ConnectionsManager extends BaseController {
 
@@ -302,9 +298,6 @@ public class ConnectionsManager extends BaseController {
         return requestToken;
     }
 
-    // little hack to allow read messages
-    private static boolean sendNextRead;
-
     private void sendRequestInternal(TLObject object, RequestDelegate onCompleteOrig, RequestDelegateTimestamp onCompleteTimestamp, QuickAckDelegate onQuickAck, WriteToSocketDelegate onWriteToSocket, int flags, int datacenterId, int connetionType, boolean immediate, int requestToken) {
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("send request " + object + " with token = " + requestToken);
@@ -335,7 +328,7 @@ public class ConnectionsManager extends BaseController {
                                             object instanceof TLRPC.TL_channels_readMessageContents
                             )
             ) {
-                if (!sendNextRead) {
+                if (!AyuState.isAllowReadPacket()) {
                     var fakeRes = new TLRPC.TL_messages_affectedMessages();
                     // idk if this should be -1 or what, check `TL_messages_readMessageContents` usages
                     fakeRes.pts = -1;
@@ -351,7 +344,7 @@ public class ConnectionsManager extends BaseController {
 
                     return;
                 } else {
-                    sendNextRead = false;
+                    AyuState.resetAllowReadPacket();
                 }
             }
 
@@ -374,7 +367,7 @@ public class ConnectionsManager extends BaseController {
                     origOnComplete.run(response, error);
 
                     getMessagesStorage().getDialogMaxMessageId(dialogId, maxId -> {
-                        sendNextRead = true;
+                        AyuState.setAllowReadPacket();
 
                         TLRPC.TL_messages_readHistory request = new TLRPC.TL_messages_readHistory();
                         request.peer = obj.peer;

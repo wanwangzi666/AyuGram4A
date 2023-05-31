@@ -109,6 +109,8 @@ import com.exteragram.messenger.boost.encryption.EncryptionHelper;
 import com.exteragram.messenger.utils.ChatUtils;
 import com.exteragram.messenger.utils.PopupUtils;
 import com.exteragram.messenger.utils.TranslatorUtils;
+import com.radolyn.ayugram.AyuConfig;
+import com.radolyn.ayugram.messages.AyuState;
 
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -5368,7 +5370,21 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         if (isInScheduleMode()) {
             AlertsCreator.createScheduleDatePickerDialog(parentActivity, parentFragment.getDialogId(), this::sendMessageInternal, resourcesProvider);
         } else {
-            sendMessageInternal(true, 0);
+            // --- AyuGram hook
+            var scheduleDate = 0;
+            if (AyuConfig.useScheduledMessages) {
+                scheduleDate = ConnectionsManager.getInstance(currentAccount).getCurrentTime() + 10; // min t = 10 sec
+
+                // ..but here's the problem:
+                // "If the schedule_date is less than 10 seconds in the future, the message will be sent immediately, generating a normal updateNewMessage/updateNewChannelMessage."
+                // we have to ensure that we have a small window for an error
+                scheduleDate += 1; // 1 sec
+
+                AyuState.setAutomaticallyScheduled();
+            }
+
+            sendMessageInternal(true, scheduleDate);
+            // --- AyuGram hook
         }
     }
 
