@@ -28,5 +28,8 @@
 
     <string name="EditsHistoryTitle">Edits history</string>
     <string name="EditsHistoryMenuText">History</string>
+
+    <string name="ReadUntilMenuText">Read until</string>
+
     <string name="LikelyOfflineStatus">offline ?</string>
 </resources>
