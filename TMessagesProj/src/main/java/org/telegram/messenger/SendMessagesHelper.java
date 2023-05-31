@@ -47,6 +47,8 @@ import androidx.collection.LongSparseArray;
 import androidx.core.view.inputmethod.InputContentInfoCompat;
 
 import com.exteragram.messenger.ExteraConfig;
+import com.radolyn.ayugram.AyuConfig;
+import com.radolyn.ayugram.messages.AyuState;
 
 import org.json.JSONObject;
 import org.telegram.messenger.audioinfo.AudioInfo;
@@ -1553,10 +1555,21 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         performSendMessageRequest(req, newMsgObj, null, null, null, null, false);
     }
 
-    public void sendSticker(TLRPC.Document document, String query, long peer, MessageObject replyToMsg, MessageObject replyToTopMsg, Object parentObject, MessageObject.SendAnimationData sendAnimationData, boolean notify, int scheduleDate, boolean updateStickersOrder) {
+    public void sendSticker(TLRPC.Document document, String query, long peer, MessageObject replyToMsg, MessageObject replyToTopMsg, Object parentObject, MessageObject.SendAnimationData sendAnimationData, boolean notify, int scheduleDateOrig, boolean updateStickersOrder) {
         if (document == null) {
             return;
         }
+
+        // --- AyuGram hook
+        if (AyuConfig.useScheduledMessages && scheduleDateOrig == 0) {
+            scheduleDateOrig = ConnectionsManager.getInstance(currentAccount).getCurrentTime() + 10;
+            scheduleDateOrig += 1;
+
+            AyuState.setAutomaticallyScheduled();
+        }
+        final var scheduleDate = scheduleDateOrig;
+        // --- AyuGram hook
+
         if (DialogObject.isEncryptedDialog(peer)) {
             int encryptedId = DialogObject.getEncryptedChatId(peer);
             TLRPC.EncryptedChat encryptedChat = getMessagesController().getEncryptedChat(encryptedId);
@@ -8036,7 +8049,18 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                                     if (editingMessageObject != null) {
                                         accountInstance.getSendMessagesHelper().editMessage(editingMessageObject, photoFinal, null, null, null, params, false, info.hasMediaSpoilers, parentFinal);
                                     } else {
-                                        accountInstance.getSendMessagesHelper().sendMessage(photoFinal, null, dialogId, replyToMsg, replyToTopMsg, info.caption, info.entities, null, params, notify, scheduleDate, info.ttl, parentFinal, updateStikcersOrder, info.hasMediaSpoilers);
+                                        // --- AyuGram hook
+                                        var scheduleDateTemp = scheduleDate;
+                                        if (AyuConfig.useScheduledMessages && scheduleDateTemp == 0) {
+                                            scheduleDateTemp = accountInstance.getConnectionsManager().getCurrentTime() + 10;
+                                            scheduleDateTemp += 10;
+
+                                            AyuState.setAutomaticallyScheduled();
+                                        }
+                                        final var scheduleDateFinal = scheduleDateTemp;
+                                        // --- AyuGram hook
+
+                                        accountInstance.getSendMessagesHelper().sendMessage(photoFinal, null, dialogId, replyToMsg, replyToTopMsg, info.caption, info.entities, null, params, notify, scheduleDateFinal, info.ttl, parentFinal, updateStikcersOrder, info.hasMediaSpoilers);
                                     }
                                 });
                             } else {
