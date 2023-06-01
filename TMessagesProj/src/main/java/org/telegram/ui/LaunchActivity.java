@@ -94,6 +94,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.firebase.appindexing.Action;
 import com.google.firebase.appindexing.FirebaseUserActions;
 import com.google.firebase.appindexing.builders.AssistActionBuilder;
+import com.radolyn.ayugram.AyuConfig;
 import com.radolyn.ayugram.AyuConstants;
 
 import org.telegram.PhoneFormat.PhoneFormat;
@@ -630,6 +631,22 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     }
                     drawerLayoutContainer.closeDrawer(false);
                 }
+
+                // --- AyuGram hook
+                if (id == AyuConstants.DRAWER_TOGGLE_GHOST) {
+                    var msg = AyuConfig.isGhostModeActive()
+                            ? LocaleController.getString("GhostModeDisabled", R.string.GhostModeDisabled)
+                            : LocaleController.getString("GhostModeEnabled", R.string.GhostModeEnabled);
+
+                    AyuConfig.toggleGhostMode();
+
+                    BulletinFactory.of(getLastFragment()).createSuccessBulletin(msg).show();
+                    drawerLayoutContainer.closeDrawer(false);
+
+                    // update button text
+                    NotificationCenter.getInstance(UserConfig.selectedAccount).postNotificationName(NotificationCenter.mainUserInfoChanged);
+                }
+                // --- AyuGram hook
             }
         });
         final ItemTouchHelper sideMenuTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {

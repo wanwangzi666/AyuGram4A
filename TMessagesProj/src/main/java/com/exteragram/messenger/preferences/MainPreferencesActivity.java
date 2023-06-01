@@ -199,8 +199,8 @@ public class MainPreferencesActivity extends BasePreferencesActivity {
         generalRow = newRow();
         appearanceRow = newRow();
         chatsRow = newRow();
-        otherRow = newRow();
         ayuRow = newRow();
+        otherRow = newRow();
         categoryDividerRow = newRow();
 
         infoHeaderRow = newRow();
@@ -280,7 +280,7 @@ public class MainPreferencesActivity extends BasePreferencesActivity {
                     } else if (position == otherRow) {
                         textCell.setTextAndIcon(LocaleController.getString("LocalOther", R.string.LocalOther), R.drawable.msg_fave, false);
                     } else if (position == ayuRow) {
-                        textCell.setTextAndIcon(LocaleController.getString("AyuPreferences", R.string.AyuPreferences), R.drawable.msg_premium_badge, false);
+                        textCell.setTextAndIcon(LocaleController.getString("AyuPreferences", R.string.AyuPreferences), R.drawable.msg2_reactions2, false);
                     } else if (position == channelRow) {
                         textCell.setTextAndValueAndIcon(LocaleController.getString("Channel", R.string.Channel), "@ayugram1338", R.drawable.msg_channel, true);
                     } else if (position == groupRow) {
