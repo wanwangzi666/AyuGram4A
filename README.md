@@ -1,45 +1,63 @@
-<img src="https://i.imgur.com/5EmxevP.png" width="150" align="left"/>
+# AyuGram for Android
 
-## exteraGram
-*[Licensed under the GNU General Public License v2.0](https://github.com/exteraSquad/exteraGram/blob/default/LICENSE)*
+![AyuGram Logo](.github/AyuGram.png)
 
-Experimental **third-party** Telegram client based on [official sources](https://github.com/DrKLO/Telegram).
+## Features
 
-[![Channel](https://img.shields.io/badge/Channel-Telegram-blue.svg)](https://t.me/exteragram)
-[![Chat](https://img.shields.io/badge/Chat-Telegram-blue.svg)](https://t.me/exteraChat)
-[![Downloads](https://img.shields.io/badge/Download%20at%20-%20Telegram-blue.svg)](https://t.me/exterareleases)
+**AyuGram4A** is built on top of exteraGram, which means we have all the features exteraGram has and
+some of Telegraher's:
 
-## Importing API hash and keys
-- You should get **YOUR OWN API KEY AND HASH** here: https://core.telegram.org/api/obtaining_api_id and create a file called `API_KEYS` in the source root directory.
-- Also you should get **YOUR OWN MAPS API KEY** here: https://console.cloud.google.com/google/maps-apis/credentials and add it to this file.
-- And you need to generate **SIGNING KEY**: https://developer.android.com/studio/publish/app-signing#generate-key
-The contents should look like this:
-```
-APP_ID = 123456
-APP_HASH = abcdef0123456789 (32 chars)
-MAPS_V2_API = abcdef01234567-abcdef012345678910111213
+- Built with official keys
+- No emulator detection
+- Screenshots in secret chats
+- Messages history (+ deleted ones)
+- No ads
+- Probably something else, check commits!
 
-SIGNING_KEY_PASSWORD = A1BcDEFHJ2KLMn3oP
-SIGNING_KEY_ALIAS = abcdefghjklm
-SIGNING_KEY_STORE_PASSWORD = Z9yXDEFHJ6KRqn7oP
-```
+...and **ghost mode**.
 
-## Compilation Guide
-1. Clone exteraGram's source code using `git clone https://github.com/exteraSquad/exteraGram/`
-2. Fill out values in `API_KEYS` like [here](https://github.com/exteraSquad/exteraGram#importing-api-hash-and-keys)
-3. Open the project in Android Studio. It should be opened, **not imported**
-4. You are ready to compile `exteraGram`
+Please note that AyuGram does **NOT** include some closed-source exteraGram features.
 
-- **exteraGram** can be built with **Android Studio** or from the command line with **Gradle**:
+## Downloads?
+
+Follow our [Telegram channel](https://t.me/ayugram1338).
+
+## Why there's no `X` feature from Telegraher?
+
+Because I'm too lazy, and some Telegraher's features are useless for the most of people.
+
+## How to contribute
+
+I'd be grateful for any contribution, since I don't really like Java. :)
+
+Work on any feature you want.
+
+## How to build
+
+1. Clone source code using `git clone https://github.com/AyuGram/AyuGram4A.git`
+2. Open the project in Android Studio. It should be opened, **not imported**
+3. You are ready to compile `AyuGram`
+
+- **AyuGram** can be built with **Android Studio** or from the command line with **Gradle**:
+
 ```
 ./gradlew assembleAfatRelease
 ```
 
-## exteraGram Localization
-Since **exteraGram** is a fork of **Telegram for Android** and most localizations follow translations of **Telegram for Android**, check it out [here](https://translations.telegram.org/en/android/). As for specialized strings for **exteraGram**, we use **Crowdin** to translate **exteraGram**. Join the project at [Crowdin](https://crowdin.com/project/exteralocales)!
+## AyuGram Localization
 
- ## Thanks to:
-- [Telegram](https://github.com/DrKLO/Telegram)
-- [Catogram](https://github.com/Catogram/Catogram) and [Catogram X](https://github.com/CatogramX/CatogramX)
-- [Nekogram](https://gitlab.com/Nekogram/Nekogram) and [Nekogram X](https://github.com/NekoX-Dev/NekoX)
-- [OwlGram](https://github.com/OwlGramDev/OwlGram)
+[![Crowdin](https://badges.crowdin.net/ayugram/localized.svg)](https://crowdin.com/project/ayugram)
+[![Crowdin](https://badges.crowdin.net/exteralocales/localized.svg)](https://crowdin.com/project/exteralocales)
+
+We have our own [Crowdin](https://crowdin.com/project/ayugram).
+
+But since AyuGram is based on **exteraGram**, also join their project
+at [Crowdin](https://crowdin.com/project/exteralocales)!
+
+## Credits
+
+- [exteraGram](https://github.com/exteraSquad/exteraGram)
+- [Telegraher](https://github.com/nikitasius/Telegraher)
+- [Cherrygram](https://github.com/arsLan4k1390/Cherrygram)
+- [Nagram](https://github.com/NextAlone/Nagram)
+- [Telegram FOSS](https://github.com/Telegram-FOSS-Team/Telegram-FOSS)
