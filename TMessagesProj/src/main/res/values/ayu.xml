@@ -39,4 +39,6 @@
     <string name="ReadUntilMenuText">Read until</string>
 
     <string name="LikelyOfflineStatus">offline ?</string>
+
+    <string name="GhostModeShortcut">Enter with Ghost</string>
 </resources>
