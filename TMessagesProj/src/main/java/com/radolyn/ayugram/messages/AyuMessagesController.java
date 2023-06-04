@@ -1,9 +1,10 @@
 package com.radolyn.ayugram.messages;
 
-import android.database.sqlite.SQLiteConstraintException;
 import android.os.Environment;
 import android.text.TextUtils;
 
+import androidx.annotation.OptIn;
+import androidx.room.ExperimentalRoomApi;
 import androidx.room.Room;
 
 import com.exteragram.messenger.ExteraConfig;
@@ -11,11 +12,14 @@ import com.google.android.exoplayer2.util.Log;
 import com.radolyn.ayugram.AyuConfig;
 import com.radolyn.ayugram.AyuConstants;
 import com.radolyn.ayugram.database.AyuDatabase;
+import com.radolyn.ayugram.database.dao.DeletedMessageDao;
+import com.radolyn.ayugram.database.dao.EditedMessageDao;
 import com.radolyn.ayugram.database.entities.DeletedMessage;
 import com.radolyn.ayugram.database.entities.EditedMessage;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.DispatchQueue;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.MessageObject;
 import org.telegram.tgnet.TLRPC;
@@ -23,6 +27,7 @@ import org.telegram.tgnet.TLRPC;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class AyuMessagesController {
     public static final String attachmentsSubfolder = "Saved Attachments";
@@ -32,9 +37,12 @@ public class AyuMessagesController {
             attachmentsSubfolder
     );
     private static AyuMessagesController instance;
+    private final DispatchQueue queue;
     private final AyuDatabase database;
+    private final EditedMessageDao editedMessageDao;
+    private final DeletedMessageDao deletedMessageDao;
 
-    private AyuMessagesController() {
+    private @OptIn(markerClass = ExperimentalRoomApi.class) AyuMessagesController() {
         // recreate for testing if debug
         if (ExteraConfig.getLogging()) {
             ApplicationLoader.applicationContext.deleteDatabase("ayu-data");
@@ -55,7 +63,13 @@ public class AyuMessagesController {
         database = Room.databaseBuilder(ApplicationLoader.applicationContext, AyuDatabase.class, "ayu-data")
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
+                .setAutoCloseTimeout(10, TimeUnit.MINUTES)
                 .build();
+
+        editedMessageDao = database.editedMessageDao();
+        deletedMessageDao = database.deletedMessageDao();
+
+        queue = new DispatchQueue("ayugram");
     }
 
     public static AyuMessagesController getInstance() {
@@ -65,15 +79,17 @@ public class AyuMessagesController {
         return instance;
     }
 
-    public boolean hasAnyRevisions(long userId, long dialogId, int msgId) {
-        return database.editedMessageDao().hasAnyRevisions(userId, dialogId, msgId);
-    }
-
     public void onMessageEdited(TLRPC.Message oldMessage, TLRPC.Message newMessage, long userId, int accountId, int currentTime) {
         if (!AyuConfig.keepMessagesHistory) {
             return;
         }
 
+        queue.postRunnable(() -> {
+            onMessageEditedInner(oldMessage, newMessage, userId, accountId, currentTime);
+        });
+    }
+
+    private void onMessageEditedInner(TLRPC.Message oldMessage, TLRPC.Message newMessage, long userId, int accountId, int currentTime) {
         boolean sameMedia = false;
         boolean isDocument = false;
         if (oldMessage.media instanceof TLRPC.TL_messageMediaPhoto && newMessage.media instanceof TLRPC.TL_messageMediaPhoto && oldMessage.media.photo != null && newMessage.media.photo != null) {
@@ -118,15 +134,13 @@ public class AyuMessagesController {
         revision.path = attachPath.equals("/") ? null : attachPath;
         revision.isDocument = isDocument;
 
-        var dao = database.editedMessageDao();
-
         var dialogId = MessageObject.getDialogId(oldMessage);
         var messageId = newMessage.id;
 
-        if (!sameMedia && revision.path != null && dao.isFirstRevisionWithChangedMedia(userId, dialogId, messageId)) {
+        if (!sameMedia && !TextUtils.isEmpty(revision.path) && editedMessageDao.isFirstRevisionWithChangedMedia(userId, dialogId, messageId)) {
             // update previous revisions to reflect media change
             // like, there's no previous file, so replace it with one we copied before...
-            dao.updateAttachmentForRevisionsBeforeDate(userId, dialogId, messageId, attachPath, currentTime);
+            editedMessageDao.updateAttachmentForRevisionsBeforeDate(userId, dialogId, messageId, attachPath, currentTime);
         }
 
         revision.userId = userId;
@@ -135,30 +149,46 @@ public class AyuMessagesController {
         revision.text = oldMessage.message;
         revision.date = currentTime;
 
-        dao.insert(revision);
-    }
-
-    public List<EditedMessage> getRevisions(long userId, long dialogId, int msgId) {
-        return database.editedMessageDao().getAllRevisions(userId, dialogId, msgId);
+        editedMessageDao.insert(revision);
     }
 
     public void onMessageDeleted(long userId, long dialogId, int msgId, int currentTime) {
+        if (!AyuConfig.keepDeletedMessages) {
+            return;
+        }
+
+        queue.postRunnable(() -> {
+            onMessageDeletedInner(userId, dialogId, msgId, currentTime);
+        });
+    }
+
+    private void onMessageDeletedInner(long userId, long dialogId, int msgId, int currentTime) {
         var msg = new DeletedMessage();
         msg.userId = userId;
         msg.dialogId = dialogId;
         msg.messageId = msgId;
         msg.date = currentTime;
 
-        database.deletedMessageDao().insert(msg);
+        deletedMessageDao.insert(msg);
+    }
+
+    public boolean hasAnyRevisions(long userId, long dialogId, int msgId) {
+        return editedMessageDao.hasAnyRevisions(userId, dialogId, msgId);
+    }
+
+    public List<EditedMessage> getRevisions(long userId, long dialogId, int msgId) {
+        return editedMessageDao.getAllRevisions(userId, dialogId, msgId);
     }
 
     public boolean isDeleted(long userId, long dialogId, int msgId) {
-        return database.deletedMessageDao().isDeleted(userId, dialogId, msgId);
+        return deletedMessageDao.isDeleted(userId, dialogId, msgId);
     }
 
     public void clean() {
-        database.editedMessageDao().cleanTable();
-        database.deletedMessageDao().cleanTable();
+        editedMessageDao.cleanTable();
+        deletedMessageDao.cleanTable();
+
+        database.close();
 
         ApplicationLoader.applicationContext.deleteDatabase("ayu-data");
     }
