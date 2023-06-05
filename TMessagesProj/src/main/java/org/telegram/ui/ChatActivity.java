@@ -25010,6 +25010,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     } else {
                         tv.setText(LocaleController.getString("ForwardsRestrictedInfoBot", R.string.ForwardsRestrictedInfoBot));
                     }
+                    if (isAyuDeleted) {
+                        tv.setText(LocaleController.getString("ForwardsRestrictedInfoDeleted", R.string.ForwardsRestrictedInfoDeleted));
+                    }
                     tv.setMaxWidth(popupLayout.getMeasuredWidth() - AndroidUtilities.dp(38));
                     
                     Drawable shadowDrawable2 = ContextCompat.getDrawable(contentView.getContext(), R.drawable.popup_fixed_alert).mutate();
