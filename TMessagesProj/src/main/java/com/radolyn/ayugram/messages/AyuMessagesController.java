@@ -26,8 +26,10 @@ import org.telegram.tgnet.TLRPC;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class AyuMessagesController {
     public static final String attachmentsSubfolder = "Saved Attachments";
@@ -162,9 +164,7 @@ public class AyuMessagesController {
             return;
         }
 
-        queue.postRunnable(() -> {
-            onMessageDeletedInner(userId, dialogId, msgId, currentTime);
-        });
+        onMessageDeletedInner(userId, dialogId, msgId, currentTime);
     }
 
     private void onMessageDeletedInner(long userId, long dialogId, int msgId, int currentTime) {
@@ -187,6 +187,13 @@ public class AyuMessagesController {
 
     public boolean isDeleted(long userId, long dialogId, int msgId) {
         return deletedMessageDao.isDeleted(userId, dialogId, msgId);
+    }
+
+    public boolean isDeleted(long userId, ArrayList<MessageObject> messageObjects) {
+        var ids = messageObjects.stream().map(MessageObject::getId).collect(Collectors.toList());
+        var dialogId = messageObjects.get(0).messageOwner.dialog_id;
+
+        return deletedMessageDao.isDeleted(userId, dialogId, ids);
     }
 
     public void clean() {
