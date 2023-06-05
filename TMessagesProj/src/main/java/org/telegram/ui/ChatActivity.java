@@ -9245,7 +9245,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     private void openForward(boolean fromActionBar) {
-        if (getMessagesController().isChatNoForwards(currentChat) || hasSelectedNoforwardsMessage()) {
+        if (getMessagesController().isChatNoForwards(currentChat) || hasSelectedNoforwardsMessage() || (currentChat != null && currentChat.ayuNoforwards)) {
             // We should update text if user changed locale without re-opening chat activity
             String str;
             if (getMessagesController().isChatNoForwards(currentChat)) {
@@ -14354,7 +14354,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 ActionBarMenuItem deleteItem = actionBar.createActionMode().getItem(delete);
 
                 createBottomMessagesActionButtons();
-                boolean noforwards = getMessagesController().isChatNoForwards(currentChat) || hasSelectedNoforwardsMessage();
+                boolean noforwards = getMessagesController().isChatNoForwards(currentChat) || hasSelectedNoforwardsMessage() || (currentChat != null && currentChat.ayuNoforwards);
                 if (prevCantForwardCount == 0 && cantForwardMessagesCount != 0 || prevCantForwardCount != 0 && cantForwardMessagesCount == 0) {
                     forwardButtonAnimation = new AnimatorSet();
                     ArrayList<Animator> animators = new ArrayList<>();
@@ -24132,17 +24132,29 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 icons.add(R.drawable.flame_small);
             }
 
-            if (!(options.contains(4) || options.contains(7))
+            if (!(options.contains(OPTION_SAVE_TO_GALLERY) || options.contains(OPTION_SAVE_TO_GALLERY2))
                     && selectedObject != null && (selectedObject.isSecretMedia() || selectedObject.isGif() || selectedObject.isNewGif() || selectedObject.isPhoto() || selectedObject.isRoundVideo() || selectedObject.isVideo())) {
                 items.add(LocaleController.getString("SaveToGallery", R.string.SaveToGallery));
-                options.add(4);
+                options.add(OPTION_SAVE_TO_GALLERY);
                 icons.add(R.drawable.msg_gallery);
             }
-            if (!options.contains(10)
+            if (!options.contains(OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC)
                     && selectedObject != null && (selectedObject.isSecretMedia() || selectedObject.isGif() || selectedObject.isNewGif() || selectedObject.isRoundVideo() || selectedObject.isVideo() || selectedObject.isDocument() || selectedObject.isMusic() || selectedObject.isVoice())) {
                 items.add(LocaleController.getString("SaveToDownloads", R.string.SaveToDownloads));
-                options.add(10);
+                options.add(OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC);
                 icons.add(R.drawable.msg_download);
+            }
+
+            if (options.contains(OPTION_FORWARD) && (message != null && message.messageOwner.ayuNoforwards || (currentChat != null && currentChat.ayuNoforwards))) {
+                items.remove(LocaleController.getString("Forward", R.string.Forward));
+                options.remove((Object)OPTION_FORWARD);
+                icons.remove((Object)R.drawable.msg_forward);
+            }
+
+            if (options.contains(OPTION_SHARE) && (message != null && message.messageOwner.ayuNoforwards || (currentChat != null && currentChat.ayuNoforwards))) {
+                items.remove(LocaleController.getString("ShareFile", R.string.ShareFile));
+                options.remove((Object)OPTION_SHARE);
+                icons.remove((Object)R.drawable.msg_shareout);
             }
             // --- AyuGram menu
 
