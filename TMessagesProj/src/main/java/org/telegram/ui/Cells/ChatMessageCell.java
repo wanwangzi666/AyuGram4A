@@ -12251,12 +12251,12 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         } else if (currentMessageObject.scheduled && currentMessageObject.messageOwner.date == 0x7FFFFFFE) {
             timeString = "";
         } else if (edited && !ayuDeleted) {
-            timeString = LocaleController.getString("EditedMessage", R.string.EditedMessage) + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
+            timeString = AyuConfig.getEditedMark() + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
         } else if (!edited && ayuDeleted) {
             timeString = AyuConfig.getDeletedMark() + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
         } else if (edited && ayuDeleted) {
             // it's both edited and deleted
-            timeString = LocaleController.getString("EditedMessage", R.string.EditedMessage) + " (" + AyuConfig.getDeletedMark() + ")" + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
+            timeString = AyuConfig.getEditedMark() + " (" + AyuConfig.getDeletedMark() + ")" + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
         } else {
             timeString = LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
         }
@@ -19137,12 +19137,12 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             if ((edited || ayuDeleted) && !lastDrawingEdited && timeLayout != null) {
                 String editedStr;
                 if (edited && !ayuDeleted){
-                    editedStr = LocaleController.getString("EditedMessage", R.string.EditedMessage);
+                    editedStr = AyuConfig.getEditedMark();
                 } else if (!edited) {
                     editedStr = AyuConfig.getDeletedMark();
                 } else {
                     // it's both edited and deleted
-                    editedStr = LocaleController.getString("EditedMessage", R.string.EditedMessage) + " (" + AyuConfig.getDeletedMark() + ")";
+                    editedStr = AyuConfig.getEditedMark() + " (" + AyuConfig.getDeletedMark() + ")";
                 }
                 CharSequence text = timeLayout.getText();
                 int i = text.toString().indexOf(editedStr);

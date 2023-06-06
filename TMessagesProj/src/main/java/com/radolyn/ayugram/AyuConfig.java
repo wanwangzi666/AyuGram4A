@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.R;
 
 public class AyuConfig {
     private static final Object sync = new Object();
@@ -59,6 +61,8 @@ public class AyuConfig {
             enableAds = preferences.getBoolean("enableAds", false);
 
             // ~ Customization
+            // deletedMarkText
+            // editedMarkText
             showGhostToggleInDrawer = preferences.getBoolean("showGhostToggleInDrawer", true);
 
             configLoaded = true;
@@ -88,5 +92,9 @@ public class AyuConfig {
 
     public static String getDeletedMark() {
         return AyuConfig.preferences.getString("deletedMarkText", "🧹");
+    }
+
+    public static String getEditedMark() {
+        return AyuConfig.preferences.getString("editedMarkText", LocaleController.getString("EditedMessage", R.string.EditedMessage));
     }
 }
