@@ -18514,7 +18514,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         // --- AyuGram hook
         if (id == AyuConstants.MESSAGES_DELETED_NOTIFICATION) {
             long dialogId = (Long) args[0];
-            if (dialogId != dialog_id && (ChatObject.isChannel(currentChat) || dialogId != 0)) {
+            if (getDialogId() != dialogId && (ChatObject.isChannel(currentChat) || dialogId != 0)) {
+                return;
+            }
+            if (chatAdapter == null) {
                 return;
             }
             ArrayList<Integer> messageIds = (ArrayList<Integer>) args[1];
@@ -18522,9 +18525,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 int mid = messageIds.get(a);
                 MessageObject currentMessage = messagesDict[0].get(mid);
                 if (currentMessage != null) {
-                    if (chatAdapter != null) {
-                        chatAdapter.updateRowWithMessageObject(currentMessage, false);
-                    }
+                    chatAdapter.updateRowWithMessageObject(currentMessage, false);
                 }
             }
         }
