@@ -39,7 +39,6 @@ public class AyuConfig {
             preferences = ApplicationLoader.applicationContext.getSharedPreferences("ayuconfig", Activity.MODE_PRIVATE);
             editor = preferences.edit();
 
-            // AyuGram
             // ~ Ghost essentials
             sendReadPackets = preferences.getBoolean("sendReadPackets", true);
             sendOnlinePackets = preferences.getBoolean("sendOnlinePackets", true);
@@ -51,8 +50,8 @@ public class AyuConfig {
             useScheduledMessages = preferences.getBoolean("useScheduledMessages", false);
 
             // ~ Message edits & deletion history
-            keepDeletedMessages = preferences.getBoolean("keepDeletedMessages", false);
-            keepMessagesHistory = preferences.getBoolean("keepMessagesHistory", false);
+            keepDeletedMessages = preferences.getBoolean("keepDeletedMessages", true);
+            keepMessagesHistory = preferences.getBoolean("keepMessagesHistory", true);
 
             // ~ QoL
             showFromChannel = preferences.getBoolean("showFromChannel", true);
