@@ -25,6 +25,7 @@ public class AyuConfig {
     public static boolean keepAliveService;
     public static boolean enableAds;
     public static boolean showGhostToggleInDrawer;
+    public static boolean WALMode;
 
     private static boolean configLoaded;
 
@@ -65,6 +66,9 @@ public class AyuConfig {
             // editedMarkText
             showGhostToggleInDrawer = preferences.getBoolean("showGhostToggleInDrawer", true);
 
+            // ~ Debug
+            WALMode = preferences.getBoolean("walMode", true);
+
             configLoaded = true;
         }
     }
@@ -96,5 +100,9 @@ public class AyuConfig {
 
     public static String getEditedMark() {
         return AyuConfig.preferences.getString("editedMarkText", LocaleController.getString("EditedMessage", R.string.EditedMessage));
+    }
+
+    public static String getWALMode() {
+        return AyuConfig.WALMode ? "WAL" : "OFF";
     }
 }
