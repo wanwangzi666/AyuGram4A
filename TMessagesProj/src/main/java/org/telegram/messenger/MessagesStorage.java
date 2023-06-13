@@ -22,6 +22,7 @@ import android.util.SparseIntArray;
 import androidx.annotation.UiThread;
 import androidx.collection.LongSparseArray;
 
+import com.google.android.exoplayer2.util.Log;
 import com.radolyn.ayugram.AyuConfig;
 import com.radolyn.ayugram.proprietary.AyuHistoryHook;
 import com.radolyn.ayugram.messages.AyuMessagesController;
@@ -8482,7 +8483,7 @@ public class MessagesStorage extends BaseController {
         //}
     }
 
-    private void getAnimatedEmoji(String join, ArrayList<TLRPC.Document> documents) {
+    public void getAnimatedEmoji(String join, ArrayList<TLRPC.Document> documents) {
         SQLiteCursor cursor = null;
         try {
             cursor = database.queryFinalized(String.format(Locale.US, "SELECT data FROM animated_emoji WHERE document_id IN (%s)", join));
