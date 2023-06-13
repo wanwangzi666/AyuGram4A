@@ -15125,6 +15125,7 @@ public class MessagesController extends BaseController implements NotificationCe
 
         // --- AyuGram request hook
         if (AyuConfig.keepDeletedMessages && deletedMessages != null) {
+            var currentTimeS = (int)(currentTime / 1000);
             var messagesStorage = getMessagesStorage();
             var userId = getAccountInstance().getUserConfig().clientUserId;
             var ayuMessagesController = AyuMessagesController.getInstance();
@@ -15136,7 +15137,7 @@ public class MessagesController extends BaseController implements NotificationCe
 
                 if (possibleDialogId == 0) {
                     // Telegram sometimes won't give us dialog id directly...
-                    var possibleIds = getMessagesStorage().getDialogIdsToUpdate(possibleDialogId, messageIds);
+                    var possibleIds = messagesStorage.getDialogIdsToUpdate(possibleDialogId, messageIds);
                     if (possibleIds != null && !possibleIds.isEmpty()) {
                         dialogIds = possibleIds;
                     }
@@ -15150,7 +15151,7 @@ public class MessagesController extends BaseController implements NotificationCe
                     for (var msgId : messageIds) {
                         var msg = messagesStorage.getMessage(dialogId, msgId);
                         var topicId = msg != null ? MessageObject.getTopicId(msg, isForum(dialogId)) : 0;
-                        ayuMessagesController.onMessageDeleted(userId, dialogId, topicId, msgId, currentAccount, getConnectionsManager().getCurrentTime(), msg);
+                        ayuMessagesController.onMessageDeleted(userId, dialogId, topicId, msgId, currentAccount, currentTimeS, msg);
                     }
 
                     AndroidUtilities.runOnUIThread(() -> {
