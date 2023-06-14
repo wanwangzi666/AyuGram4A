@@ -9813,8 +9813,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     private void openScheduledMessages() {
-        if (AyuState.isAutomaticallyScheduled()) {
-            AyuState.resetAutomaticallyScheduled();
+        if (AyuState.getAutomaticallyScheduled()) {
             return;
         }
         if (parentLayout == null || parentLayout.getLastFragment() != this) {
@@ -25725,11 +25724,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 presentFragment(new AyuMessageHistory(getUserConfig().clientUserId, selectedObject));
                 break;
             case AyuConstants.OPTION_TTL:
-                AyuState.setAllowReadPacket();
+                AyuState.setAllowReadPacket(true, 1);
                 sendSecretMessageRead(selectedObject, true);
                 break;
             case AyuConstants.OPTION_READ_UNTIL:
-                AyuGhostUtils.markRead(getMessagesController(), getConnectionsManager(), selectedObject);
+                AyuGhostUtils.markRead(currentAccount, selectedObject.messageOwner.id, getMessagesController().getInputPeer(selectedObject.messageOwner.peer_id));
                 break;
             case OPTION_RETRY: {
                 if (selectedObjectGroup != null) {

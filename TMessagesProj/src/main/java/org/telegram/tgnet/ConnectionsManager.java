@@ -12,6 +12,8 @@ import android.util.Base64;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.radolyn.ayugram.AyuConfig;
 import com.radolyn.ayugram.AyuConstants;
+import com.radolyn.ayugram.sync.AyuSyncController;
+import com.radolyn.ayugram.utils.AyuGhostUtils;
 import com.radolyn.ayugram.utils.AyuState;
 
 import org.json.JSONArray;
@@ -321,17 +323,15 @@ public class ConnectionsManager extends BaseController {
             if (
                     !AyuConfig.sendReadPackets &&
                             (
+                                    object instanceof TLRPC.TL_messages_readHistory ||
+                                    object instanceof TLRPC.TL_messages_readEncryptedHistory ||
                                     object instanceof TLRPC.TL_messages_readDiscussion ||
-                                            object instanceof TLRPC.TL_messages_readEncryptedHistory ||
-                                            object instanceof TLRPC.TL_messages_readHistory ||
-                                            object instanceof TLRPC.TL_messages_readMessageContents ||
-                                            object instanceof TLRPC.TL_channels_readHistory ||
-                                            object instanceof TLRPC.TL_channels_readMessageContents
+                                    object instanceof TLRPC.TL_messages_readMessageContents ||
+                                    object instanceof TLRPC.TL_channels_readHistory ||
+                                    object instanceof TLRPC.TL_channels_readMessageContents
                             )
             ) {
-                if (AyuState.isAllowReadPacket()) {
-                    AyuState.resetAllowReadPacket();
-                } else {
+                if (!AyuState.getAllowReadPacket()) {
                     var fakeRes = new TLRPC.TL_messages_affectedMessages();
                     // idk if this should be -1 or what, check `TL_messages_readMessageContents` usages
                     fakeRes.pts = -1;
@@ -343,6 +343,11 @@ public class ConnectionsManager extends BaseController {
                         }
                     } catch (Exception e) {
                         FileLog.e(e);
+                    }
+
+                    var pair = AyuGhostUtils.getDialogIdAndMessageIdFromRequest(object);
+                    if (pair != null) {
+                        AyuSyncController.getInstance().syncRead(currentAccount, pair.first, pair.second);
                     }
 
                     return;
@@ -364,14 +369,7 @@ public class ConnectionsManager extends BaseController {
                 }
 
                 if (peer != null) {
-                    long dialogId;
-                    if (peer.chat_id != 0) {
-                        dialogId = -peer.chat_id;
-                    } else if (peer.channel_id != 0) {
-                        dialogId = -peer.channel_id;
-                    } else {
-                        dialogId = peer.user_id;
-                    }
+                    var dialogId = AyuGhostUtils.getDialogId(peer);
 
                     var origOnComplete = onCompleteOrig;
                     TLRPC.InputPeer finalPeer = peer;
@@ -383,7 +381,7 @@ public class ConnectionsManager extends BaseController {
                             request.peer = finalPeer;
                             request.max_id = maxId;
 
-                            AyuState.setAllowReadPacket();
+                            AyuState.setAllowReadPacket(true, 1);
                             sendRequest(request, (a1, a2) -> {});
                         });
                     };

@@ -5380,7 +5380,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                 // we have to ensure that we have a small window for an error
                 scheduleDate += 1; // 1 sec
 
-                AyuState.setAutomaticallyScheduled();
+                AyuState.setAutomaticallyScheduled(true, 1);
             }
 
             sendMessageInternal(true, scheduleDate);

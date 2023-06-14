@@ -1565,7 +1565,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
             scheduleDateOrig = ConnectionsManager.getInstance(currentAccount).getCurrentTime() + 10;
             scheduleDateOrig += 1;
 
-            AyuState.setAutomaticallyScheduled();
+            AyuState.setAutomaticallyScheduled(true, 1);
         }
         final var scheduleDate = scheduleDateOrig;
         // --- AyuGram hook
@@ -8055,7 +8055,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                                             scheduleDateTemp = accountInstance.getConnectionsManager().getCurrentTime() + 10;
                                             scheduleDateTemp += 10;
 
-                                            AyuState.setAutomaticallyScheduled();
+                                            AyuState.setAutomaticallyScheduled(true, 1);
                                         }
                                         final var scheduleDateFinal = scheduleDateTemp;
                                         // --- AyuGram hook
