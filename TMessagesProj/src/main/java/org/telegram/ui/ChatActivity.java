@@ -119,6 +119,7 @@ import com.google.zxing.common.detector.MathUtils;
 import com.radolyn.ayugram.AyuConfig;
 import com.radolyn.ayugram.AyuConstants;
 import com.radolyn.ayugram.messages.AyuMessagesController;
+import com.radolyn.ayugram.proprietary.AyuHistoryHook;
 import com.radolyn.ayugram.utils.AyuState;
 import com.radolyn.ayugram.utils.AyuGhostUtils;
 import com.radolyn.ayugram.ui.AyuMessageHistory;
@@ -15791,6 +15792,22 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     dropPhotoAction = action;
                 }
             }
+
+            // --- AyuGram hook
+            if (!messArr.isEmpty()) {
+                var msg1 = messArr.get(0);
+                var msg2 = messArr.get(messArr.size() - 1);
+
+                var startId = Math.min(msg1.getId(), msg2.getId());
+                var endId = Math.max(msg1.getId(), msg2.getId());
+
+                var dialogId = getDialogId();
+                var threadId = getThreadId();
+
+                AyuHistoryHook.doHook(currentAccount, messArr, startId, endId, dialogId, 10000, threadId);
+            }
+            // --- AyuGram hook
+
             for (int a = 0; a < messArr.size(); a++) {
                 MessageObject obj = messArr.get(a);
                 if (obj.replyMessageObject != null) {
