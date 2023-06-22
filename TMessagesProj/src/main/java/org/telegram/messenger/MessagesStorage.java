@@ -22,9 +22,7 @@ import android.util.SparseIntArray;
 import androidx.annotation.UiThread;
 import androidx.collection.LongSparseArray;
 
-import com.google.android.exoplayer2.util.Log;
 import com.radolyn.ayugram.AyuConfig;
-import com.radolyn.ayugram.proprietary.AyuHistoryHook;
 import com.radolyn.ayugram.messages.AyuMessagesController;
 
 import org.telegram.PhoneFormat.PhoneFormat;
@@ -1254,7 +1252,6 @@ public class MessagesStorage extends BaseController {
             try {
                 ArrayList<Long> dialogsToCleanup = new ArrayList<>();
 
-                AyuMessagesController.getInstance().clean();
                 database.executeFast("DELETE FROM reaction_mentions").stepThis().dispose();
                 database.executeFast("DELETE FROM reaction_mentions_topics").stepThis().dispose();
                 database.executeFast("DELETE FROM downloading_documents").stepThis().dispose();
