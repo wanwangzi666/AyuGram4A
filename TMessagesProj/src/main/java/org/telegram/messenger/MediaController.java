@@ -65,6 +65,7 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 
+import com.radolyn.ayugram.AyuConfig;
 import org.telegram.messenger.audioinfo.AudioInfo;
 import org.telegram.messenger.video.MediaCodecVideoConvertor;
 import org.telegram.messenger.voip.VoIPService;
@@ -1361,7 +1362,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             ArrayList<Integer> markAsDeletedMessages = (ArrayList<Integer>) args[0];
             if (playingMessageObject != null) {
                 if (channelId == playingMessageObject.messageOwner.peer_id.channel_id) {
-                    if (markAsDeletedMessages.contains(playingMessageObject.getId())) {
+                    if (markAsDeletedMessages.contains(playingMessageObject.getId()) && !AyuConfig.keepDeletedMessages) {
                         cleanupPlayer(true, true);
                     }
                 }

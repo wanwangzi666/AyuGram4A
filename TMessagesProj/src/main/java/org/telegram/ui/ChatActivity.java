@@ -16847,7 +16847,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
             ArrayList<Integer> markAsDeletedMessages = (ArrayList<Integer>) args[0];
             long channelId = (Long) args[1];
-            processDeletedMessages(markAsDeletedMessages, channelId);
+
+            // --- AyuGram hook
+            if (!AyuConfig.keepDeletedMessages) {
+                processDeletedMessages(markAsDeletedMessages, channelId);
+            }
+            // --- AyuGram hook
         } else if (id == NotificationCenter.messageReceivedByServer) {
             Boolean scheduled = (Boolean) args[6];
             if (scheduled != (chatMode == MODE_SCHEDULED)) {
