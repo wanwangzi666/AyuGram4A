@@ -16856,7 +16856,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             long channelId = (Long) args[1];
 
             // --- AyuGram hook
-            if (!AyuConfig.keepDeletedMessages) {
+            if (AyuState.getAllowDeleteMessages()) {
                 processDeletedMessages(markAsDeletedMessages, channelId);
             }
             // --- AyuGram hook

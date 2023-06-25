@@ -63,6 +63,7 @@ import androidx.annotation.RawRes;
 import androidx.annotation.RequiresApi;
 import androidx.core.util.Consumer;
 
+import com.radolyn.ayugram.utils.AyuState;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -5611,6 +5612,7 @@ public class AlertsCreator {
         final TLRPC.Chat chatFinal = actionChat;
         builder.setPositiveButton(LocaleController.getString("Delete", R.string.Delete), (dialogInterface, i) -> {
             ArrayList<Integer> ids = null;
+            AyuState.setAllowDeleteMessages(true, 1);
             if (selectedMessage != null) {
                 ids = new ArrayList<>();
                 ArrayList<Long> random_ids = null;
