@@ -35,6 +35,9 @@
 -keep class androidx.camera.core.impl.** { *; }
 -keep class androidx.camera.video.** { *; }
 
+# AyuSync
+-keep class com.radolyn.ayugram.sync.** { *; }
+
 # https://developers.google.com/ml-kit/known-issues#android_issues
 -keep class com.google.mlkit.nl.languageid.internal.LanguageIdentificationJni { *; }
 
