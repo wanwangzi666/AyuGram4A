@@ -114,6 +114,7 @@ import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.zxing.common.detector.MathUtils;
 import com.radolyn.ayugram.AyuConfig;
 import com.radolyn.ayugram.AyuConstants;
+import com.radolyn.ayugram.AyuFilter;
 import com.radolyn.ayugram.AyuUtils;
 import com.radolyn.ayugram.messages.AyuMessagesController;
 import com.radolyn.ayugram.proprietary.AyuHistoryHook;
@@ -28450,6 +28451,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 });
             } else if (viewType == 4) {
                 view = new ChatLoadingCell(mContext, contentView, themeDelegate);
+            } else if (viewType == -1) {
+                view = new View(mContext);
             }
             view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
             return new RecyclerListView.Holder(view);
@@ -28869,7 +28872,17 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
             if (position >= messagesStartRow && position < messagesEndRow) {
                 ArrayList<MessageObject> messages = isFrozen ? frozenMessages : ChatActivity.this.messages;
-                return messages.get(position - messagesStartRow).contentType;
+                var msg = messages.get(position - messagesStartRow);
+
+                // --- AyuGram hook
+                if (AyuConfig.regexFiltersEnabled) {
+                    if (AyuFilter.isFiltered(msg)) {
+                        return -1;
+                    }
+                }
+                // --- AyuGram hook
+
+                return msg.contentType;
             } else if (position == botInfoRow) {
                 return 3;
             }
