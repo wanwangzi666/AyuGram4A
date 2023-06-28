@@ -28486,7 +28486,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 });
             } else if (viewType == 4) {
                 view = new ChatLoadingCell(mContext, contentView, themeDelegate);
-            } else if (viewType == -1) {
+            } else if (viewType == -1000) {
                 view = new View(mContext);
             }
             view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
@@ -28915,7 +28915,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     var msgToCheck = group == null ? msg : group.findPrimaryMessageObject();
 
                     if (AyuFilter.isFiltered(msgToCheck)) {
-                        return -1;
+                        // fixme: mark as read if in visible part
+                        return -1000;
                     }
                 }
                 // --- AyuGram hook
