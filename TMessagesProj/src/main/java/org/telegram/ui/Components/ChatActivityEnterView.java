@@ -5370,9 +5370,9 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         if (isInScheduleMode()) {
             AlertsCreator.createScheduleDatePickerDialog(parentActivity, parentFragment.getDialogId(), this::sendMessageInternal, resourcesProvider);
         } else {
-            // --- AyuGram hook
+            // --- AyuGram scheduled hook
             var scheduleDate = 0;
-            if (AyuConfig.useScheduledMessages) {
+            if (AyuConfig.useScheduledMessages && !DialogObject.isEncryptedDialog(dialog_id)) {
                 scheduleDate = ConnectionsManager.getInstance(currentAccount).getCurrentTime() + 10; // min t = 10 sec
 
                 // ..but here's the problem:
@@ -5382,9 +5382,9 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
 
                 AyuState.setAutomaticallyScheduled(true, 1);
             }
+            // --- AyuGram hook
 
             sendMessageInternal(true, scheduleDate);
-            // --- AyuGram hook
         }
     }
 
