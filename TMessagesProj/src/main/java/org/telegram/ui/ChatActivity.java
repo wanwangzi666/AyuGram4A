@@ -15830,7 +15830,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         endId = Math.min(msg1, msg2);
                     }
                 } else {
-                    if (!messages.isEmpty()) {
+                    if (!messages.isEmpty()) { // idk why I added this one but well if it's here then it should be here.
                         endId = AyuUtils.getMinRealId(messages);
                     }
 
