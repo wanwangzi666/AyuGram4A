@@ -1555,21 +1555,10 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         performSendMessageRequest(req, newMsgObj, null, null, null, null, false);
     }
 
-    public void sendSticker(TLRPC.Document document, String query, long peer, MessageObject replyToMsg, MessageObject replyToTopMsg, Object parentObject, MessageObject.SendAnimationData sendAnimationData, boolean notify, int scheduleDateOrig, boolean updateStickersOrder) {
+    public void sendSticker(TLRPC.Document document, String query, long peer, MessageObject replyToMsg, MessageObject replyToTopMsg, Object parentObject, MessageObject.SendAnimationData sendAnimationData, boolean notify, int scheduleDate, boolean updateStickersOrder) {
         if (document == null) {
             return;
         }
-
-        // --- AyuGram scheduled hook
-        if (AyuConfig.useScheduledMessages && scheduleDateOrig == 0 && !DialogObject.isEncryptedDialog(peer)) {
-            scheduleDateOrig = ConnectionsManager.getInstance(currentAccount).getCurrentTime() + 10;
-            scheduleDateOrig += 1;
-
-            AyuState.setAutomaticallyScheduled(true, 1);
-        }
-        final var scheduleDate = scheduleDateOrig;
-        // --- AyuGram hook
-
         if (DialogObject.isEncryptedDialog(peer)) {
             int encryptedId = DialogObject.getEncryptedChatId(peer);
             TLRPC.EncryptedChat encryptedChat = getMessagesController().getEncryptedChat(encryptedId);
@@ -1683,10 +1672,25 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         return sendMessage(messages, peer, forwardFromMyName, hideCaption, notify, scheduleDate, null);
     }
 
-    public int sendMessage(ArrayList<MessageObject> messages, final long peer, boolean forwardFromMyName, boolean hideCaption, boolean notify, int scheduleDate, MessageObject replyToTopMsg) {
+    public int sendMessage(ArrayList<MessageObject> messages, final long peer, boolean forwardFromMyName, boolean hideCaption, boolean notify, int scheduleDateOrig, MessageObject replyToTopMsg) {
         if (messages == null || messages.isEmpty()) {
             return 0;
         }
+
+        // --- AyuGram scheduled hook
+        if (AyuConfig.useScheduledMessages && !DialogObject.isEncryptedDialog(peer) && scheduleDateOrig == 0) {
+            scheduleDateOrig = ConnectionsManager.getInstance(currentAccount).getCurrentTime() + 10; // min t = 10 sec
+
+            // ..but here's the problem:
+            // "If the schedule_date is less than 10 seconds in the future, the message will be sent immediately, generating a normal updateNewMessage/updateNewChannelMessage."
+            // we have to ensure that we have a small window for an error
+            scheduleDateOrig += 1; // 1 sec
+
+            AyuState.setAutomaticallyScheduled(true, 1);
+        }
+        var scheduleDate = scheduleDateOrig;
+        // --- AyuGram hook
+
         int sendResult = 0;
         long myId = getUserConfig().getClientUserId();
         boolean isChannel = false;
@@ -3353,6 +3357,25 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         if (message == null && caption == null) {
             caption = "";
         }
+
+        // --- AyuGram scheduled hook
+        if (AyuConfig.useScheduledMessages && !DialogObject.isEncryptedDialog(peer) && scheduleDate == 0) {
+            scheduleDate = ConnectionsManager.getInstance(currentAccount).getCurrentTime() + 10; // min t = 10 sec
+
+            // ..but here's the problem:
+            // "If the schedule_date is less than 10 seconds in the future, the message will be sent immediately, generating a normal updateNewMessage/updateNewChannelMessage."
+            // we have to ensure that we have a small window for an error
+            scheduleDate += 1; // 1 sec
+
+            if (document != null) {
+                scheduleDate += 15;
+            } else if (photo != null) {
+                scheduleDate += 10;
+            }
+
+            AyuState.setAutomaticallyScheduled(true, 1);
+        }
+        // --- AyuGram hook
 
         String originalPath = null;
         if (params != null && params.containsKey("originalPath")) {
@@ -8049,18 +8072,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                                     if (editingMessageObject != null) {
                                         accountInstance.getSendMessagesHelper().editMessage(editingMessageObject, photoFinal, null, null, null, params, false, info.hasMediaSpoilers, parentFinal);
                                     } else {
-                                        // --- AyuGram scheduled hook
-                                        var scheduleDateTemp = scheduleDate;
-                                        if (AyuConfig.useScheduledMessages && scheduleDateTemp == 0 && !DialogObject.isEncryptedDialog(dialogId)) {
-                                            scheduleDateTemp = accountInstance.getConnectionsManager().getCurrentTime() + 10;
-                                            scheduleDateTemp += 10;
-
-                                            AyuState.setAutomaticallyScheduled(true, 1);
-                                        }
-                                        final var scheduleDateFinal = scheduleDateTemp;
-                                        // --- AyuGram hook
-
-                                        accountInstance.getSendMessagesHelper().sendMessage(photoFinal, null, dialogId, replyToMsg, replyToTopMsg, info.caption, info.entities, null, params, notify, scheduleDateFinal, info.ttl, parentFinal, updateStikcersOrder, info.hasMediaSpoilers);
+                                        accountInstance.getSendMessagesHelper().sendMessage(photoFinal, null, dialogId, replyToMsg, replyToTopMsg, info.caption, info.entities, null, params, notify, scheduleDate, info.ttl, parentFinal, updateStikcersOrder, info.hasMediaSpoilers);
                                     }
                                 });
                             } else {
