@@ -986,6 +986,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private final static int OPTION_HISTORY = 205;
 
     private final static int[] allowedNotificationsDuringChatListAnimations = new int[]{
+            AyuConstants.SECRET_MESSAGES_DELETED_NOTIFICATION,
             AyuConstants.MESSAGES_DELETED_NOTIFICATION,
 
             NotificationCenter.messagesRead,
@@ -2405,6 +2406,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         getNotificationCenter().addObserver(this, NotificationCenter.messageTranslated);
         getNotificationCenter().addObserver(this, NotificationCenter.messageTranslating);
 
+        getNotificationCenter().addObserver(this, AyuConstants.SECRET_MESSAGES_DELETED_NOTIFICATION);
         getNotificationCenter().addObserver(this, AyuConstants.MESSAGES_DELETED_NOTIFICATION);
 
         super.onFragmentCreate();
@@ -2762,6 +2764,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         getNotificationCenter().removeObserver(this, NotificationCenter.messageTranslated);
         getNotificationCenter().removeObserver(this, NotificationCenter.messageTranslating);
 
+        getNotificationCenter().removeObserver(this, AyuConstants.SECRET_MESSAGES_DELETED_NOTIFICATION);
         getNotificationCenter().removeObserver(this, AyuConstants.MESSAGES_DELETED_NOTIFICATION);
 
         if (currentEncryptedChat != null) {
@@ -15795,8 +15798,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             var dialogId = getDialogId();
             var threadId = getThreadId();
 
-            var startId = 0;
-            var endId = Integer.MAX_VALUE;
+            var minVal = isSecretChat() ? Integer.MAX_VALUE : 0;
+            var maxVal = isSecretChat() ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+
+            var startId = minVal; // top message (startId < endId)
+            // ...deleted messages
+            var endId = minVal; // bottom message
 
             var limit = 500;
 
@@ -15806,7 +15813,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
                 startId = Math.min(msg1.getId(), msg2.getId());
                 endId = Math.max(msg1.getId(), msg2.getId());
-                
+
                 // - deleted messages between loaded part and unloaded part
                 // IDK what should I do :(
 
@@ -15814,12 +15821,16 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
                 // allows loading messages that are under bottom messages
                 if (dialog != null && dialog.top_message == endId) {
-                    endId = Integer.MAX_VALUE;
+                    // startId is the smallest in the current batch
+                    endId = maxVal;
                 }
-
                 // allows loading messages that are uppermore than the dialog (make sure it's the up and not a cache)
-                if (messArr.size() < count && !isCache && (load_type == 2 || load_type == 1)) {
-                    startId = 0;
+                else if (messArr.size() < count && !isCache && (load_type == 2 || load_type == 1) && !messArr.isEmpty()) {
+                    var msgId1 = messArr.get(0).getId();
+                    var msgId2 = messArr.get(messArr.size() - 1).getId();
+
+                    startId = minVal;
+                    endId = Math.min(msgId1, msgId2);
                 }
             } else {
                 if (!messages.isEmpty()) {
@@ -15827,13 +15838,21 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
 
                 if (isCache) {
-                    startId = 0;
-                    endId = 0;
+                    startId = minVal;
+                    endId = minVal;
                 }
             }
 
-            Log.d("AyuGram", "messArr: " + messArr.size() + " , startId: " + startId +  " , endId: " + endId + " , limit" + limit + " , load_type: " + load_type + " , isCache: " + isCache);
-            AyuHistoryHook.doHook(currentAccount, messArr, startId, endId, dialogId, limit, threadId);
+            if (startId > endId) {
+                var t = startId;
+                startId = endId;
+                endId = t;
+            }
+
+            Log.d("AyuGram", "messArr: " + messArr.size() + " , startId: " + startId +  " , endId: " + endId + " , limit: " + limit + " , load_type: " + load_type + " , isCache: " + isCache);
+            if (startId != minVal || endId != minVal) {
+                AyuHistoryHook.doHook(currentAccount, messArr, startId, endId, dialogId, limit, threadId, isSecretChat());
+            }
             // --- AyuGram hook
 
             for (int a = 0; a < messArr.size(); a++) {
@@ -18561,7 +18580,25 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
 
         // --- AyuGram hook
-        if (id == AyuConstants.MESSAGES_DELETED_NOTIFICATION) {
+        if (id == AyuConstants.SECRET_MESSAGES_DELETED_NOTIFICATION) {
+            long dialogId = (Long) args[0];
+            if (getDialogId() != dialogId) {
+                return;
+            }
+            if (chatAdapter == null) {
+                return;
+            }
+            ArrayList<Long> messageIds = (ArrayList<Long>) args[1];
+            var messagesController = getMessagesController();
+            for (int a = 0, N = messageIds.size(); a < N; a++) {
+                long mid = messageIds.get(a);
+                MessageObject currentMessage = messagesController.dialogMessagesByRandomIds.get(mid);
+                if (currentMessage != null) {
+                    currentMessage.messageOwner.ayuDeleted = true;
+                    chatAdapter.updateRowWithMessageObject(currentMessage, false);
+                }
+            }
+        } else if (id == AyuConstants.MESSAGES_DELETED_NOTIFICATION) {
             long dialogId = (Long) args[0];
             if (getDialogId() != dialogId && (ChatObject.isChannel(currentChat) || dialogId != 0)) {
                 return;
@@ -24167,7 +24204,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
 
             if (message != null
-                    && ((message.messageOwner.flags & TLRPC.MESSAGE_FLAG_EDITED) != 0 || message.isEditing())
                     && message.messageOwner.from_id != null
                     && message.messageOwner.from_id.user_id != getAccountInstance().getUserConfig().getClientUserId()
                     && AyuMessagesController.getInstance().hasAnyRevisions(getAccountInstance().getUserConfig().getClientUserId(), dialog_id, message.messageOwner.id)
@@ -24178,19 +24214,21 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
 
             if (message != null && message.messageOwner.ttl > 0 && !isAyuDeleted) {
-                items.add(String.format("TTL %d", message.messageOwner.ttl));
+                items.add("TTL: " + LocaleController.formatTTLString(message.messageOwner.ttl));
                 options.add(AyuConstants.OPTION_TTL);
-                icons.add(R.drawable.flame_small);
+                icons.add(R.drawable.msg_autodelete);
             }
 
             if (!(options.contains(OPTION_SAVE_TO_GALLERY) || options.contains(OPTION_SAVE_TO_GALLERY2))
-                    && selectedObject != null && (selectedObject.isSecretMedia() || selectedObject.isGif() || selectedObject.isNewGif() || selectedObject.isPhoto() || selectedObject.isRoundVideo() || selectedObject.isVideo())) {
+                    && AyuUtils.isMediaDownloadable(selectedObject)
+            ) {
                 items.add(LocaleController.getString("SaveToGallery", R.string.SaveToGallery));
                 options.add(OPTION_SAVE_TO_GALLERY);
                 icons.add(R.drawable.msg_gallery);
             }
             if (!options.contains(OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC)
-                    && selectedObject != null && (selectedObject.isSecretMedia() || selectedObject.isGif() || selectedObject.isNewGif() || selectedObject.isRoundVideo() || selectedObject.isVideo() || selectedObject.isDocument() || selectedObject.isMusic() || selectedObject.isVoice())) {
+                    && AyuUtils.isMediaDownloadable(selectedObject)
+            ) {
                 items.add(LocaleController.getString("SaveToDownloads", R.string.SaveToDownloads));
                 options.add(OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC);
                 icons.add(R.drawable.msg_download);
