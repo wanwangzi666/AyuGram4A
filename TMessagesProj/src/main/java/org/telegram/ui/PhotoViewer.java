@@ -4094,7 +4094,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 return;
             }
             // --- AyuGram hook
-            if (AyuConfig.keepDeletedMessages) {
+            if (AyuConfig.saveDeletedMessages) {
                 return;
             }
             // --- AyuGram hook

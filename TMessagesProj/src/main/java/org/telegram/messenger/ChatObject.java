@@ -1663,7 +1663,7 @@ public class ChatObject {
     }
 
     public static boolean isNotInChat(TLRPC.Chat chat) {
-        if (!AyuConfig.keepDeletedMessages) {
+        if (!AyuConfig.saveDeletedMessages) {
             return chat == null || chat instanceof TLRPC.TL_chatEmpty || chat instanceof TLRPC.TL_chatForbidden || chat instanceof TLRPC.TL_channelForbidden || chat.left || chat.kicked || chat.deactivated;
         }
 

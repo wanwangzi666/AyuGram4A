@@ -27,12 +27,10 @@ import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
 import android.text.util.Linkify;
 import android.util.Base64;
-import android.util.Log;
 
 import androidx.collection.LongSparseArray;
 
 import com.exteragram.messenger.boost.encryption.BaseEncryptor;
-import com.exteragram.messenger.boost.filter.ZalgoFilter;
 import com.radolyn.ayugram.AyuConfig;
 import com.radolyn.ayugram.AyuConstants;
 
@@ -5975,7 +5973,7 @@ public class MessageObject {
     }
 
     public boolean needDrawBluredPreview() {
-        return needDrawBluredPreview(!AyuConfig.keepDeletedMessages);
+        return needDrawBluredPreview(!AyuConfig.saveDeletedMessages);
     }
 
     public boolean needDrawBluredPreview(boolean really) {

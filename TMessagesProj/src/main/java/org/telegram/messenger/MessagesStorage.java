@@ -4258,7 +4258,7 @@ public class MessagesStorage extends BaseController {
                                 continue;
                             } else {
                                 // --- AyuGram hook
-                                if (AyuConfig.keepMessagesHistory) {
+                                if (AyuConfig.saveMessagesHistory) {
                                     AyuMessagesController.getInstance().onMessageEditedForce(message, getUserConfig().clientUserId, currentAccount, (int)(System.currentTimeMillis() / 1000));
                                 }
                                 // --- AyuGram hook

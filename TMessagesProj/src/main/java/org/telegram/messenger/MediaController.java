@@ -104,7 +104,6 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
-import com.exteragram.messenger.ExteraConfig;
 import com.exteragram.messenger.utils.SystemUtils;
 import com.radolyn.ayugram.AyuConstants;
 
@@ -1362,7 +1361,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             ArrayList<Integer> markAsDeletedMessages = (ArrayList<Integer>) args[0];
             if (playingMessageObject != null) {
                 if (channelId == playingMessageObject.messageOwner.peer_id.channel_id) {
-                    if (markAsDeletedMessages.contains(playingMessageObject.getId()) && !AyuConfig.keepDeletedMessages) {
+                    if (markAsDeletedMessages.contains(playingMessageObject.getId()) && !AyuConfig.saveDeletedMessages) {
                         cleanupPlayer(true, true);
                     }
                 }
