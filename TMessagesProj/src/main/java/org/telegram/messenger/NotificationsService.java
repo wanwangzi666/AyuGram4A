@@ -8,6 +8,7 @@
 
 package org.telegram.messenger;
 
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +20,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.radolyn.ayugram.AyuConfig;
+import org.telegram.ui.LaunchActivity;
 
 import java.util.Random;
 
@@ -57,18 +59,24 @@ public class NotificationsService extends Service {
                     .setSound(null, null)
                     .build();
 
-            var funnyText = notifications[new Random().nextInt(notifications.length)];
-
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
             notificationManager.createNotificationChannel(channel);
-            startForeground(9999,
-                    new NotificationCompat.Builder(this, CHANNEL_ID)
-                            .setSmallIcon(R.drawable.msg_premium_badge)
-                            .setShowWhen(false)
-                            .setOngoing(true)
-                            .setContentText(funnyText)
-                            .setCategory(NotificationCompat.CATEGORY_STATUS)
-                            .build());
+
+            var cuteText = notifications[new Random().nextInt(notifications.length)];
+
+            var startIntent = new Intent(this, LaunchActivity.class);
+            var pendingIntent = PendingIntent.getActivity(this, 0, startIntent, PendingIntent.FLAG_MUTABLE);
+
+            var notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setContentIntent(pendingIntent)
+                    .setSmallIcon(R.drawable.msg_premium_badge)
+                    .setShowWhen(false)
+                    .setOngoing(true)
+                    .setContentText(cuteText)
+                    .setCategory(NotificationCompat.CATEGORY_STATUS)
+                    .build();
+
+            startForeground(9999, notification);
         }
     }
 
