@@ -33,6 +33,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.util.Consumer;
 
+import com.radolyn.ayugram.utils.AyuState;
 import org.telegram.SQLite.SQLiteCursor;
 import org.telegram.SQLite.SQLiteDatabase;
 import org.telegram.SQLite.SQLiteException;
@@ -6108,6 +6109,11 @@ public class MessagesController extends BaseController implements NotificationCe
             if (DialogObject.isEncryptedDialog(dialogId) && messages != null && !messages.isEmpty()) { // process TTL messages from secrets
                 for (int a = 0; a < messages.size(); a++) {
                     int id = messages.get(a);
+
+                    if (AyuState.deletePermitted(dialogId, id)) {
+                        continue;
+                    }
+
                     MessageObject obj = dialogMessagesByIds.get(id);
                     if (obj == null) {
                         var msg = getMessagesStorage().getMessage(dialogId, id);
@@ -6129,6 +6135,10 @@ public class MessagesController extends BaseController implements NotificationCe
                 var invalidate = new ArrayList<Integer>();
 
                 for (var msgId : messages) {
+                    if (AyuState.deletePermitted(dialogId, msgId)) {
+                        continue;
+                    }
+
                     var msg = getMessagesStorage().getMessage(dialogId, msgId);
                     if (msg != null) {
                         if (msg.ttl > 0 || msg.ttl_period > 0) {
@@ -6142,6 +6152,15 @@ public class MessagesController extends BaseController implements NotificationCe
                     // invalidating views
                     getNotificationCenter().postNotificationName(AyuConstants.MESSAGES_DELETED_NOTIFICATION, dialogId, invalidate);
                 });
+            } else if ((messages != null && !messages.isEmpty())) {
+                var ayuMessagesController = AyuMessagesController.getInstance();
+                var userId = UserConfig.getInstance(currentAccount).clientUserId;
+
+                for (var msgId : messages) {
+                    if (AyuState.deletePermitted(dialogId, msgId)) {
+                        ayuMessagesController.delete(userId, dialogId, msgId);
+                    }
+                }
             }
         }
         // --- AyuGram hook

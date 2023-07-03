@@ -5612,7 +5612,6 @@ public class AlertsCreator {
         final TLRPC.Chat chatFinal = actionChat;
         builder.setPositiveButton(LocaleController.getString("Delete", R.string.Delete), (dialogInterface, i) -> {
             ArrayList<Integer> ids = null;
-            AyuState.setAllowDeleteMessages(true, 1);
             if (selectedMessage != null) {
                 ids = new ArrayList<>();
                 ArrayList<Long> random_ids = null;
@@ -5620,6 +5619,7 @@ public class AlertsCreator {
                     for (int a = 0; a < selectedGroup.messages.size(); a++) {
                         MessageObject messageObject = selectedGroup.messages.get(a);
                         ids.add(messageObject.getId());
+                        AyuState.permitDeleteMessage(dialogId, messageObject.getId());
                         if (encryptedChat != null && messageObject.messageOwner.random_id != 0 && messageObject.type != 10) {
                             if (random_ids == null) {
                                 random_ids = new ArrayList<>();
@@ -5629,6 +5629,7 @@ public class AlertsCreator {
                     }
                 } else {
                     ids.add(selectedMessage.getId());
+                    AyuState.permitDeleteMessage(dialogId, selectedMessage.getId());
                     if (encryptedChat != null && selectedMessage.messageOwner.random_id != 0 && selectedMessage.type != 10) {
                         random_ids = new ArrayList<>();
                         random_ids.add(selectedMessage.messageOwner.random_id);
@@ -5640,6 +5641,7 @@ public class AlertsCreator {
                     ids = new ArrayList<>();
                     for (int b = 0; b < selectedMessages[a].size(); b++) {
                         ids.add(selectedMessages[a].keyAt(b));
+                        AyuState.permitDeleteMessage(dialogId, selectedMessages[a].keyAt(b));
                     }
                     ArrayList<Long> random_ids = null;
                     long channelId = 0;
