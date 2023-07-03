@@ -15820,8 +15820,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     var dialog = getMessagesController().getDialog(dialogId);
 
                     TLRPC.TL_forumTopic topic = null;
-                    if (isThreadChat()) {
-                        topic = getMessagesController().getTopicsController().findTopic(getCurrentChatInfo().id, threadId);
+                    if (isTopic) {
+                        topic = getMessagesController().getTopicsController().findTopic(getCurrentChatInfo().id, getTopicId());
                     }
 
                     // allows loading messages that are under bottom messages
