@@ -9179,7 +9179,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             for (SparseArrayWithTouch<MessageObject> selectedMessagesId : selectedMessagesIds) {
                 for (int j = 0; j < selectedMessagesId.size(); ++j) {
                     MessageObject msg = selectedMessagesId.valueAt(j);
-                    if (msg != null && msg.messageOwner != null && msg.messageOwner.noforwards) {
+                    if (msg != null && msg.messageOwner != null && (msg.messageOwner.noforwards || msg.messageOwner.ayuDeleted)) {
                         return true;
                     }
                 }
