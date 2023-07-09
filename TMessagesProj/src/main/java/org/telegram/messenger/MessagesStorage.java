@@ -25,6 +25,7 @@ import androidx.collection.LongSparseArray;
 import com.radolyn.ayugram.AyuConfig;
 import com.radolyn.ayugram.messages.AyuMessagesController;
 
+import com.radolyn.ayugram.messages.AyuSavePreferences;
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.SQLite.SQLiteCursor;
 import org.telegram.SQLite.SQLiteDatabase;
@@ -4259,7 +4260,9 @@ public class MessagesStorage extends BaseController {
                             } else {
                                 // --- AyuGram hook
                                 if (AyuConfig.saveMessagesHistory) {
-                                    AyuMessagesController.getInstance().onMessageEditedForce(message, getUserConfig().clientUserId, currentAccount, (int)(System.currentTimeMillis() / 1000));
+                                    var prefs = new AyuSavePreferences(message, currentAccount);
+                                    prefs.setDialogId(dialogId);
+                                    AyuMessagesController.getInstance().onMessageEditedForce(prefs);
                                 }
                                 // --- AyuGram hook
 
@@ -13538,7 +13541,9 @@ public class MessagesStorage extends BaseController {
                                         sameMedia = oldMessage.media.document.id == message.media.document.id;
                                     }
                                     if (message.from_id != null && (!oldMessage.message.equals(message.message) || !sameMedia)) {
-                                        AyuMessagesController.getInstance().onMessageEdited(oldMessage, message, getUserConfig().clientUserId, getAccountInstance().getCurrentAccount(), getConnectionsManager().getCurrentTime());
+                                        var prefs = new AyuSavePreferences(oldMessage, currentAccount);
+                                        prefs.setDialogId(dialogId);
+                                        AyuMessagesController.getInstance().onMessageEdited(prefs, message);
                                     }
                                     if (!sameMedia) {
                                         addFilesToDelete(oldMessage, filesToDelete, idsToDelete, namesToDelete, false);
