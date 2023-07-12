@@ -28954,7 +28954,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     var group = getGroup(msg.getGroupId());
                     var msgToCheck = group == null ? msg : group.findPrimaryMessageObject();
 
-                    if (AyuFilter.isFiltered(msgToCheck)) {
+                    if (AyuFilter.isFiltered(msgToCheck, group)) {
                         // fixme: mark as read if in visible part
                         return -1000;
                     }
