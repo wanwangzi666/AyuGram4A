@@ -15791,9 +15791,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
             }
 
-            // --- AyuGram hook
+            // --- AyuGram hook main
             var dialogId = getDialogId();
-            var threadId = getThreadId();
+            var topicId = getTopicId();
 
             int minVal = isSecretChat() ? Integer.MAX_VALUE : 0;
             int maxVal = isSecretChat() ? Integer.MIN_VALUE : Integer.MAX_VALUE;
@@ -15884,7 +15884,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             Log.d("AyuGram", "messArr: " + messArr.size() + " , startId: " + startId +  " , endId: " + endId + " , limit: " + limit + " , load_type: " + load_type + " , isCache: " + isCache);
             if (!isInScheduleMode() && (startId != minVal || endId != minVal)) {
                 var needToReset = messArr.size() == count;
-                AyuHistoryHook.doHook(currentAccount, messArr, startId, endId, dialogId, limit, threadId, isSecretChat());
+                AyuHistoryHook.doHook(currentAccount, messArr, messagesDict, startId, endId, dialogId, limit, topicId, isSecretChat());
                 if (needToReset) {
                     count = messArr.size();
                 }
