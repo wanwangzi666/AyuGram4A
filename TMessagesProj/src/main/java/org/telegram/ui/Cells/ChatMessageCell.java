@@ -80,7 +80,6 @@ import androidx.core.math.MathUtils;
 
 import com.exteragram.messenger.ExteraConfig;
 import com.radolyn.ayugram.AyuConfig;
-import com.radolyn.ayugram.messages.AyuMessagesController;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
