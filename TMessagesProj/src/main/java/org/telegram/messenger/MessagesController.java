@@ -6111,7 +6111,7 @@ public class MessagesController extends BaseController implements NotificationCe
                 for (int a = 0; a < messages.size(); a++) {
                     int id = messages.get(a);
 
-                    if (AyuState.deletePermitted(dialogId, id)) {
+                    if (AyuState.isDeletePermitted(dialogId, id)) {
                         continue;
                     }
 
@@ -6138,7 +6138,7 @@ public class MessagesController extends BaseController implements NotificationCe
                 var invalidate = new ArrayList<Integer>();
 
                 for (var msgId : messages) {
-                    if (AyuState.deletePermitted(dialogId, msgId)) {
+                    if (AyuState.isDeletePermitted(dialogId, msgId)) {
                         continue;
                     }
 
@@ -6163,7 +6163,7 @@ public class MessagesController extends BaseController implements NotificationCe
                 var userId = UserConfig.getInstance(currentAccount).clientUserId;
 
                 for (var msgId : messages) {
-                    if (AyuState.deletePermitted(dialogId, msgId)) {
+                    if (AyuState.isDeletePermitted(dialogId, msgId)) {
                         ayuMessagesController.delete(userId, dialogId, msgId);
                     }
                 }
