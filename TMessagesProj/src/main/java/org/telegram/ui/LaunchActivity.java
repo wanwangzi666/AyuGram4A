@@ -96,6 +96,7 @@ import com.google.firebase.appindexing.FirebaseUserActions;
 import com.google.firebase.appindexing.builders.AssistActionBuilder;
 import com.radolyn.ayugram.AyuConfig;
 import com.radolyn.ayugram.AyuConstants;
+import com.radolyn.ayugram.AyuCustomHandlers;
 import com.radolyn.ayugram.AyuUtils;
 
 import org.telegram.PhoneFormat.PhoneFormat;
@@ -2663,6 +2664,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                                         open_settings = 7;
                                     } else if ((url.startsWith("tg:update") || url.startsWith("tg://update"))) {
                                         checkUpdates = true;
+                                    } else if ((url.startsWith("tg:ayu") || url.startsWith("tg://ayu"))) {
+                                        AyuCustomHandlers.handleAyu(getLastFragment());
+                                    } else if ((url.startsWith("tg:xiaomi") || url.startsWith("tg://xiaomi"))) {
+                                        AyuCustomHandlers.handleXiaomi(getLastFragment());
                                     } else {
                                         unsupportedUrl = url.replace("tg://", "").replace("tg:", "");
                                         int index;
