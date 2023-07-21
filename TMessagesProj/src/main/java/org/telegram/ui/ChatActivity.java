@@ -25854,7 +25854,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         boolean preserveDim = false;
         switch (option) {
             case AyuConstants.OPTION_HISTORY:
-                presentFragment(new AyuMessageHistory(getUserConfig().clientUserId, selectedObject));
+                presentFragment(new AyuMessageHistory(selectedObject));
                 break;
             case AyuConstants.OPTION_TTL:
                 AyuState.setAllowReadPacket(true, 1);
