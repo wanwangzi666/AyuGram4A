@@ -12490,10 +12490,6 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 adminString = adminLabel;
                 adminWidth = (int) Math.ceil(Theme.chat_adminPaint.measureText(adminString));
                 nameWidth -= adminWidth;
-            } else if (AyuConfig.showFromChannel && isMegagroup && currentChat != null && currentMessageObject.isFromChannel()) {
-                adminString = LocaleController.getString("DiscussChannel", R.string.DiscussChannel);;
-                adminWidth = (int) Math.ceil(Theme.chat_adminPaint.measureText(adminString));
-                nameWidth -= adminWidth;
             } else {
                 adminString = null;
                 adminWidth = 0;
