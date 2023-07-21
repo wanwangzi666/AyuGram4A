@@ -18863,7 +18863,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             if (messageObject.sponsoredChannelPost != 0) {
                 messageId = messageObject.sponsoredChannelPost;
             }
-            if (AyuConfig.enableAds) {
+            if (!AyuConfig.disableAds) {
                 getMessagesController().ensureMessagesLoaded(dialogId, messageId, null);
             } else {
                 if (!messageObject.isSponsored()) {
@@ -18875,7 +18875,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
         }
         sponsoredMessagesAdded = true;
-        if (AyuConfig.enableAds) {
+        if (!AyuConfig.disableAds) {
             sponsoredMessagesPostsBetween = res.posts_between != null ? res.posts_between : 0;
             if (notPushedSponsoredMessages != null) {
                 notPushedSponsoredMessages.clear();
@@ -19924,7 +19924,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     private int getSponsoredMessagesCount() {
-        if (AyuConfig.enableAds) {
+        if (!AyuConfig.disableAds) {
             int sponsoredMessagesCount = 0;
             while (sponsoredMessagesCount < messages.size()) {
                 if (!messages.get(sponsoredMessagesCount).isSponsored()) {
@@ -19935,7 +19935,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             return sponsoredMessagesCount;
         }
 
-        // !AyuConfig.enableAds
         return 0;
     }
 
