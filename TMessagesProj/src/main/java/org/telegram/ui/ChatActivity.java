@@ -9180,7 +9180,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             for (SparseArrayWithTouch<MessageObject> selectedMessagesId : selectedMessagesIds) {
                 for (int j = 0; j < selectedMessagesId.size(); ++j) {
                     MessageObject msg = selectedMessagesId.valueAt(j);
-                    if (msg != null && msg.messageOwner != null && (msg.messageOwner.noforwards || msg.messageOwner.ayuDeleted)) {
+                    if (msg != null && msg.messageOwner != null && msg.messageOwner.noforwards) {
                         return true;
                     }
                 }
@@ -9245,7 +9245,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     private void openForward(boolean fromActionBar) {
-        if (getMessagesController().isChatNoForwards(currentChat) || hasSelectedNoforwardsMessage() || (currentChat != null && currentChat.ayuNoforwards)) {
+        if (getMessagesController().isChatNoForwards(currentChat) || hasSelectedNoforwardsMessage()) {
             // We should update text if user changed locale without re-opening chat activity
             String str;
             if (getMessagesController().isChatNoForwards(currentChat)) {
@@ -14353,7 +14353,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 ActionBarMenuItem deleteItem = actionBar.createActionMode().getItem(delete);
 
                 createBottomMessagesActionButtons();
-                boolean noforwards = getMessagesController().isChatNoForwards(currentChat) || hasSelectedNoforwardsMessage() || (currentChat != null && currentChat.ayuNoforwards);
+                boolean noforwards = getMessagesController().isChatNoForwards(currentChat) || hasSelectedNoforwardsMessage();
                 if (prevCantForwardCount == 0 && cantForwardMessagesCount != 0 || prevCantForwardCount != 0 && cantForwardMessagesCount == 0) {
                     forwardButtonAnimation = new AnimatorSet();
                     ArrayList<Animator> animators = new ArrayList<>();
@@ -23587,7 +23587,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             allowPin = false;
         }
         allowPin = allowPin && message.getId() > 0 && (message.messageOwner.action == null || message.messageOwner.action instanceof TLRPC.TL_messageActionEmpty);
-        boolean noforwards = getMessagesController().isChatNoForwards(currentChat) || message.messageOwner.noforwards || isAyuDeleted;
+        boolean noforwards = getMessagesController().isChatNoForwards(currentChat) || message.messageOwner.noforwards;
         boolean allowUnpin = message.getDialogId() != mergeDialogId && allowPin && (pinnedMessageObjects.containsKey(message.getId()) || groupedMessages != null && !groupedMessages.messages.isEmpty() && pinnedMessageObjects.containsKey(groupedMessages.messages.get(0).getId()));
         boolean allowEdit = message.canEditMessage(currentChat) && !chatActivityEnterView.hasAudioToSend() && message.getDialogId() != mergeDialogId;
         if (allowEdit && groupedMessages != null) {
@@ -23618,7 +23618,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         // there's a chance Telegram will clean "Saved messages"
         // btw, thanks @AniMyaaa for testing on herself lol
         if (isAyuDeleted) {
-            allowChatActions = false;
+//            allowChatActions = false;
             allowPin = false;
             allowUnpin = false;
             allowEdit = false;
@@ -24251,7 +24251,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
 
             if (!(options.contains(OPTION_SAVE_TO_GALLERY) || options.contains(OPTION_SAVE_TO_GALLERY2))
-                    && AyuUtils.isMediaDownloadable(selectedObject)
+                    && AyuUtils.isMediaDownloadable(selectedObject, true)
             ) {
                 var idx = options.size() - 1;
 
@@ -24264,7 +24264,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 icons.add(idx, R.drawable.msg_gallery);
             }
             if (!options.contains(OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC)
-                    && AyuUtils.isMediaDownloadable(selectedObject)
+                    && AyuUtils.isMediaDownloadable(selectedObject, false)
             ) {
                 var idx = options.size() - 1;
 
@@ -25155,9 +25155,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 LocaleController.getString("ForwardsRestrictedInfoGroup", R.string.ForwardsRestrictedInfoGroup));
                     } else {
                         tv.setText(LocaleController.getString("ForwardsRestrictedInfoBot", R.string.ForwardsRestrictedInfoBot));
-                    }
-                    if (isAyuDeleted) {
-                        tv.setText(LocaleController.getString("ForwardsRestrictedInfoDeleted", R.string.ForwardsRestrictedInfoDeleted));
                     }
                     tv.setMaxWidth(popupLayout.getMeasuredWidth() - AndroidUtilities.dp(38));
                     

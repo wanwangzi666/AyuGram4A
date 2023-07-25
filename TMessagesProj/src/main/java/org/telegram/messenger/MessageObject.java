@@ -5939,6 +5939,11 @@ public class MessageObject {
     }
 
     public static boolean shouldEncryptPhotoOrVideo(TLRPC.Message message) {
+        // AyuGram: disable encryption
+        if (true) {
+            return false;
+        }
+
         if (message instanceof TLRPC.TL_message_secret) {
             return (getMedia(message) instanceof TLRPC.TL_messageMediaPhoto || isVideoMessage(message)) && message.ttl > 0 && message.ttl <= 60;
         } else {
